@@ -1,6 +1,6 @@
 # EP Kvíz
 
-Tato verze známe hry "AZ Kvíz", nabídne neskutečnou zábavu a pobavení, dozvíte se nové a naučíte se nové vědomsti o SPŠ Trutnov, konkrétně z pohledu předmětu EP.
+Tato verze známe hry "AZ Kvíz", nabídne neskutečnou zábavu a pobavení, dozvíte se nové a naučíte se nové vědomsti o SPŠ Trutnov, konkrétně z pohledu oboru EP.
 
 Nabídneme vám otázky a informace, které jen tak nikde neseženete.
 Máme připraené herní módy až pro dva tými o dvou hráčích.
