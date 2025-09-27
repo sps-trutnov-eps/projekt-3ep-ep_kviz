@@ -1,8 +1,83 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "EPKvíz";
+    Layout = null;
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!doctype html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-family: "Orbitron", sans-serif;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            color: #fff;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 12px rgba(0,255,255,0.6);
+        }
+
+        nav {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 220px;
+        }
+
+        .button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            background: linear-gradient(180deg,#00f2ff,#0088ff);
+            color: #fff;
+            box-shadow: 0 0 14px rgba(0,136,255,0.6);
+            transition: transform .15s ease, box-shadow .15s ease;
+        }
+
+            .button:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 20px rgba(0,242,255,0.9);
+            }
+
+            .button:active {
+                transform: scale(0.97);
+            }
+    </style>
+</head>
+<body>
+    <h1>EPKvíz</h1>
+    <nav>
+        <a href="#" class="button">---</a>
+        <a href="#" class="button">---</a>
+        <a href="#" class="button">---</a>
+    </nav>
+</body>
+</html>
