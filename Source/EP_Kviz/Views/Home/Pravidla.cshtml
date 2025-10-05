@@ -1,0 +1,81 @@
+﻿@{
+    ViewData["Title"] = "EPKvíz";
+    Layout = null;
+}
+
+<!doctype html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-family: "Orbitron", sans-serif;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            color: #fff;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 12px rgba(0,255,255,0.6);
+        }
+
+        .home-button {
+            position: absolute;
+            top: 24px;
+            right: 32px;
+            padding: 0.7rem 1.4rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            background: linear-gradient(180deg,#00f2ff,#0088ff);
+            color: #fff;
+            text-decoration: none;
+            box-shadow: 0 0 10px rgba(0,136,255,0.5);
+            transition: transform .15s, box-shadow .15s;
+            z-index: 10;
+        }
+
+            .home-button:hover {
+                transform: scale(1.07);
+                box-shadow: 0 0 18px rgba(0,242,255,0.8);
+            }
+
+    </style>
+</head>
+
+<body>
+    <h1>EPKvíz - Pravidla</h1>
+    <a href="/Home/Index" class="home-button">Zpět</a>
+    <p>Pravidla hry:</p>
+    <ul>
+        <li>Hra obsahuje otázeky z SPŠ Trutnov.</li>
+        <li>Každá otázka má svoje pole v herním poli.</li>
+        <li>Za každou správnou odpověď získáte danne pole.</li>
+        <li>Na každou otázku máte 1 minutu na odpověď.</li>
+        <li>Za každou špatně se pole mění na černé otázky Ano/Ne.</li>
+        <li>Hra končí, když tým nebo hráč spojí všechny strany herního pole.</li>
+        <li>Hodně štěstí!</li>
+    </ul>
+</body>
+</html>
