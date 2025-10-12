@@ -1,45 +1,10 @@
 ﻿@{
     ViewData["Title"] = "EPKvíz";
-    Layout = null;
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<!doctype html>
-<html lang="cs">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>@ViewData["Title"]</title>
-
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
-
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html, body {
-            height: 100%;
-            width: 100%;
-        }
-
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            font-family: "Orbitron", sans-serif;
-            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
-            color: #fff;
-        }
-
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 2rem;
-            text-shadow: 0 0 12px rgba(0,255,255,0.6);
-        }
-
         nav {
             display: flex;
             flex-direction: column;
@@ -92,6 +57,7 @@
         }
     </style>
 </head>
+
 <body>
     <a href="/Home/Login" class="login-button">Přihlásit se</a>
     <h1>EPKvíz</h1>
@@ -99,6 +65,7 @@
         <a href="#" class="button">Hrát</a>
         <a href="/Home/Pravidla" class="button">Pravidla</a>
         <a href="#" class="button">Tabulka skóre</a>
-    </nav>
+        <a href="/Home/Privacy" class="button">Ochrana osobních údajů</a> 
+    </nav> 
 </body>
-</html>
+
