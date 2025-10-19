@@ -1,7 +1,13 @@
 var builder = WebApplication.CreateBuilder(args);
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(7078); // Naslouchá na všech IP adresách na portu 7078
+});
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddMemoryCache(); 
 
 var app = builder.Build();
 

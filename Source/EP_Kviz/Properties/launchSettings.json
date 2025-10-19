@@ -4,25 +4,28 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:56872",
+      "applicationUrl": "http://0.0.0.0:56872",
       "sslPort": 44305
     }
   },
-  "profiles": {
-    "http": {
-      "commandName": "Project",
-      "dotnetRunMessages": true,
-      "launchBrowser": true,
-      "applicationUrl": "http://localhost:5182",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+  {
+    "profiles": {
+      "EP_Kviz": {
+        "commandName": "Project",
+        "dotnetRunMessages": true,
+        "launchBrowser": true,
+        "applicationUrl": "http://0.0.0.0:7078", // ← ZMĚŇTE TOTO (místo localhost)
+        "environmentVariables": {
+          "ASPNETCORE_ENVIRONMENT": "Development"
+        }
       }
-    },
+    }
+  }
     "https": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:7078;http://localhost:5182",
+      "applicationUrl": "https://0.0.0.0:7078;http://0.0.0.0:5182",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
