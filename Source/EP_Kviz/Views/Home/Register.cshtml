@@ -1,7 +1,5 @@
-﻿@model LoginViewModel
-
-@{
-    ViewData["Title"] = "EPKvíz - Přihlášení";
+﻿@{
+    ViewData["Title"] = "EPKvíz - Registrace";
     Layout = null;
 }
 
@@ -64,9 +62,15 @@
             }
     </style>
 </head>
+
 <body>
-    <h1>@ViewData["Title"]</h1>
-    <h3>Přihlášení</h3>
+    @model RegisterViewModel
+
+    @{
+        ViewData["Title"] = "Registrace";
+    }
+
+    <h3>Registrace</h3>
     <form method="post">
         <div>
             <label>Uživatelské jméno</label>
@@ -76,9 +80,11 @@
             <label>Heslo</label>
             <input asp-for="Password" type="password" />
         </div>
-        <button type="submit">Přihlásit</button>
+        <button type="submit">Registrovat</button>
     </form>
     <p>@ViewBag.Message</p>
+
     <a href="/Home/Index" class="home-button">Zpět</a>
 </body>
+
 </html>
