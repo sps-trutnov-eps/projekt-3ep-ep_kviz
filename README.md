@@ -7,6 +7,8 @@ Máme připravené herní módy až pro dva tými o dvou hráčích.
 Unikátní herní pole.
 Ukládání vašeho skóre, ukládané na vašem účtu.
 
+## Důležité!
+Pokud budete chtít hrát z více zařízení musíte mít povolený firewall na počítači kde běží stránka s portem 7078
 
 #
 zdrojový kód uchováván v složce source
