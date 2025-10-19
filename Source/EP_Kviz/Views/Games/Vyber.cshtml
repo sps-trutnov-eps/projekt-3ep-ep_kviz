@@ -1,24 +1,53 @@
 ﻿<h1>Výběr herního módu</h1>
 
+@if (TempData["Error"] != null)
+{
+    <div style="color: red; padding: 1rem; background: #ffe0e0; border-radius: 8px; margin-bottom: 1rem;">
+        @TempData["Error"]
+    </div>
+}
+
 <form id="gameForm">
-    <label for="playerId">Zadej ID hráče:</label>
+    <label for="playerId">Zadej své ID:</label>
     <input type="number" id="playerId" name="playerId" min="1" required style="margin-bottom:1rem;" />
 
-    <div style="display:flex; flex-direction:column; gap:1rem; width:220px; margin-top:1rem;">
+    <h3>Vytvořit novou hru:</h3>
+    <div style="display:flex; flex-direction:column; gap:1rem; width:220px; margin-bottom:2rem;">
         <button type="button" class="button" onclick="goToMode('Procviceni')">Procvičení</button>
         <button type="button" class="button" onclick="goToMode('OneVOne')">1v1</button>
         <button type="button" class="button" onclick="goToMode('TwoVTwo')">2v2</button>
     </div>
+
+    <h3>Nebo se připoj k existující hře:</h3>
+    <label for="joinGameId">ID hry:</label>
+    <input type="number" id="joinGameId" name="joinGameId" min="100000" max="999999" style="margin-bottom:0.5rem;" />
+    <button type="button" class="button button-secondary" onclick="joinGame()">Připojit se</button>
 </form>
 
 <script>
     function goToMode(mode) {
         const pid = document.getElementById('playerId').value;
         if (!pid) {
-            alert('Zadej prosím ID hráče.');
+            alert('Zadej prosím své ID.');
             return;
         }
         window.location.href = `/Games/${mode}?pid=${pid}`;
+    }
+
+    function joinGame() {
+        const pid = document.getElementById('playerId').value;
+        const gameId = document.getElementById('joinGameId').value;
+
+        if (!pid) {
+            alert('Zadej prosím své ID.');
+            return;
+        }
+        if (!gameId) {
+            alert('Zadej prosím ID hry.');
+            return;
+        }
+
+        window.location.href = `/Games/Join?gameId=${gameId}&pid=${pid}`;
     }
 </script>
 
@@ -38,6 +67,7 @@
         transition: transform .15s ease, box-shadow .15s ease;
         border: none;
         cursor: pointer;
+        width: 100%;
     }
 
         .button:hover {
@@ -47,5 +77,14 @@
 
         .button:active {
             transform: scale(0.97);
+        }
+
+    .button-secondary {
+        background: linear-gradient(180deg,#6c757d,#495057);
+        box-shadow: 0 0 14px rgba(108,117,125,0.6);
+    }
+
+        .button-secondary:hover {
+            box-shadow: 0 0 20px rgba(108,117,125,0.9);
         }
 </style>
