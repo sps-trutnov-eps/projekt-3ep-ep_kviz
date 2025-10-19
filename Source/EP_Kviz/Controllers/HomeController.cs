@@ -28,11 +28,6 @@ namespace EP_Kviz.Controllers
             return View();
         }
 
-        public IActionResult Login()
-        {
-            return View();
-        }
-
         public IActionResult Vyber()
         {
             return View();
@@ -43,5 +38,59 @@ namespace EP_Kviz.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+            
+
+        private static List<User> users = new();
+        private static int nextId = 1;
+
+        [HttpGet]
+        public IActionResult Register()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Register(RegisterViewModel model)
+        {
+            if (users.Any(u => u.Username == model.Username))
+            {
+                ViewBag.Message = "Uživatel již existuje.";
+                return View();
+            }
+
+            var user = new User
+            {
+                Id = nextId++,
+                Username = model.Username,
+                Password = model.Password
+            };
+            users.Add(user);
+
+            ViewBag.Message = "Registrace úspìšná!";
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult Login(LoginViewModel model)
+        {
+            var user = users.FirstOrDefault(u => u.Username == model.Username && u.Password == model.Password);
+            if (user != null)
+            {
+                ViewBag.Message = $"Pøihlášení úspìšné! Vaše ID: {user.Id}";
+            }
+            else
+            {
+                ViewBag.Message = "Špatné jméno nebo heslo.";
+            }
+            return View();
+        }
+
+
     }
 }
