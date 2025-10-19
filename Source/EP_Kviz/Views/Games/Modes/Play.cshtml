@@ -8,23 +8,41 @@
 
 <h1>Mód: @mode</h1>
 
-<div style="background: #f0f0f0; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-    <p><strong>ID hry:</strong> @gameId</p>
+<div style="background: #8AAAEB; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+    <p><strong>ID hry:</strong> <span id="gameId">@gameId</span></p>
     <p><strong>Tvoje ID:</strong> @playerId</p>
-    <p><strong>Počet hráčů:</strong> @playerCount</p>
-    <p><strong>Hráči v lobbyi:</strong> @string.Join(", ", players)</p>
+    <p><strong>Počet hráčů:</strong> <span id="playerCount">@playerCount</span></p>
+    <p><strong>Hráči v lobbyi:</strong> <span id="playerList">@string.Join(", ", players)</span></p>
 </div>
 
-<div style="background: #fff3cd; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-    <p>🔗 <strong>Sdílej toto ID s přáteli:</strong> <code style="font-size: 1.5rem; font-weight: bold;">@gameId</code></p>
+<div style="background: #405A99; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+    <p>🔗 <strong>Sdílej toto ID s přáteli:</strong> <code style="font-size: 1.5rem; font-weight: bold; background: #8AAAEB;">@gameId</code></p>
     <p>Můžou se připojit na hlavní stránce zadáním tohoto ID.</p>
 </div>
 
 <div>
     <h2>Hra začíná...</h2>
     <p>Zde bude vaše herní logika</p>
-    <!-- TODO: Přidat herní logiku -->
 </div>
+
+<script>
+    // Automatické obnovování informací každou sekundu
+    setInterval(async function() {
+        try {
+            const gameId = document.getElementById('gameId').textContent;
+            const response = await fetch(`/Games/GetGameInfo?gameId=${gameId}`);
+            const data = await response.json();
+
+            if (!data.error) {
+                // Aktualizuje počet hráčů a seznam - jen tyto elementy bliknou
+                document.getElementById('playerCount').textContent = data.playerCount;
+                document.getElementById('playerList').textContent = data.players.join(', ');
+            }
+        } catch (error) {
+            console.error('Chyba při načítání dat:', error);
+        }
+    }, 1000); // 1000 ms = 1 sekunda
+</script>
 
 <style>
     code {

@@ -6,19 +6,16 @@ public class GamesController : Controller
 {
     private readonly IMemoryCache _cache;
 
-    // Konstruktor - ASP.NET automaticky předá cache
     public GamesController(IMemoryCache cache)
     {
         _cache = cache;
     }
 
-    // Výběr módu
     public IActionResult Vyber()
     {
         return View();
     }
 
-    // Vytvoření nové hry - 1v1
     public IActionResult OneVOne(int pid)
     {
         int gameId = GenerateRandomGameId();
@@ -31,13 +28,11 @@ public class GamesController : Controller
             CreatedAt = DateTime.Now
         };
 
-        // Uložení do cache (vydrží 2 hodiny)
         _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
 
         return RedirectToAction("Play", new { gameId = gameId, pid = pid });
     }
 
-    // Vytvoření nové hry - 2v2
     public IActionResult TwoVTwo(int pid)
     {
         int gameId = GenerateRandomGameId();
@@ -55,7 +50,6 @@ public class GamesController : Controller
         return RedirectToAction("Play", new { gameId = gameId, pid = pid });
     }
 
-    // Vytvoření nové hry - Procvičení
     public IActionResult Procviceni(int pid)
     {
         int gameId = GenerateRandomGameId();
@@ -73,12 +67,10 @@ public class GamesController : Controller
         return RedirectToAction("Play", new { gameId = gameId, pid = pid });
     }
 
-    // Připojení k existující hře
     public IActionResult Join(int gameId, int pid)
     {
         if (_cache.TryGetValue($"game_{gameId}", out GameSession game))
         {
-            // Hra existuje - přidáme hráče
             if (!game.Players.Contains(pid))
             {
                 game.Players.Add(pid);
@@ -89,13 +81,11 @@ public class GamesController : Controller
         }
         else
         {
-            // Hra neexistuje
             TempData["Error"] = "Hra s tímto ID neexistuje nebo již skončila!";
             return RedirectToAction("Vyber");
         }
     }
 
-    // Herní stránka
     public IActionResult Play(int gameId, int pid)
     {
         if (_cache.TryGetValue($"game_{gameId}", out GameSession game))
@@ -115,7 +105,22 @@ public class GamesController : Controller
         }
     }
 
-    // Generování náhodného Game ID
+    [HttpGet]
+    public IActionResult GetGameInfo(int gameId)
+    {
+        if (_cache.TryGetValue($"game_{gameId}", out GameSession game))
+        {
+            return Json(new
+            {
+                playerCount = game.Players.Count,
+                players = game.Players,
+                mode = game.Mode
+            });
+        }
+
+        return Json(new { error = "Game not found" });
+    }
+
     private int GenerateRandomGameId()
     {
         var random = new Random();
