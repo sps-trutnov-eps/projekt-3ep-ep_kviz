@@ -30,18 +30,62 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
+            flex-direction: column; /* match Register layout */
             font-family: "Orbitron", sans-serif;
             background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
             color: #fff;
         }
 
+        /* Keep container layout but remove the visual "frame" */
+        .container {
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            background: transparent;     /* removed colored background */
+            box-shadow: none;            /* removed frame / glow */
+        }
+
         h1 {
-            font-size: 3rem;
-            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
             text-shadow: 0 0 12px rgba(0,255,255,0.6);
         }
 
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        input {
+            padding: 0.7rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        button {
+            padding: 0.7rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            background: linear-gradient(180deg,#00f2ff,#0088ff);
+            color: #fff;
+            cursor: pointer;
+            transition: transform .15s, box-shadow .15s;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 18px rgba(0,242,255,0.8);
+        }
+
+        /* Make the back button match Register: positioned top-right */
         .home-button {
             position: absolute;
             top: 24px;
@@ -58,27 +102,22 @@
             z-index: 10;
         }
 
-            .home-button:hover {
-                transform: scale(1.07);
-                box-shadow: 0 0 18px rgba(0,242,255,0.8);
-            }
+        .home-button:hover {
+            transform: scale(1.07);
+            box-shadow: 0 0 18px rgba(0,242,255,0.8);
+        }
     </style>
 </head>
 <body>
-    <h1>@ViewData["Title"]</h1>
-    <h3>Přihlášení</h3>
-    <form method="post">
-        <div>
-            <label>Uživatelské jméno</label>
-            <input asp-for="Username" />
-        </div>
-        <div>
-            <label>Heslo</label>
-            <input asp-for="Password" type="password" />
-        </div>
-        <button type="submit">Přihlásit</button>
-    </form>
-    <p>@ViewBag.Message</p>
-    <a href="/Home/Index" class="home-button">Zpět</a>
+    <div class="container">
+        <h1>Přihlášení</h1>
+        <form method="post">
+            <input asp-for="Username" placeholder="Uživatelské jméno" />
+            <input asp-for="Password" type="password" placeholder="Heslo" />
+            <button type="submit">Přihlásit</button>
+        </form>
+    </div>
+
+    <a href="/Home/Index" class="home-button">Zpět na hlavní stránku</a>
 </body>
 </html>

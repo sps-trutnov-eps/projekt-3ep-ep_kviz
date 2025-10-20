@@ -1,4 +1,6 @@
-﻿@{
+﻿@model RegisterViewModel
+
+@{
     ViewData["Title"] = "EPKvíz - Registrace";
     Layout = null;
 }
@@ -60,31 +62,48 @@
                 transform: scale(1.07);
                 box-shadow: 0 0 18px rgba(0,242,255,0.8);
             }
+
+        /* Přidání společných stylů pro formulář */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 300px;
+        }
+
+        input {
+            padding: 0.7rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 0.7rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(180deg,#00f2ff,#0088ff);
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+            button:hover {
+                background: linear-gradient(180deg,#0088ff,#00f2ff);
+            }
     </style>
 </head>
-
 <body>
-    @model RegisterViewModel
-
-    @{
-        ViewData["Title"] = "Registrace";
-    }
-
-    <h3>Registrace</h3>
-    <form method="post">
-        <div>
-            <label>Uživatelské jméno</label>
-            <input asp-for="Username" />
-        </div>
-        <div>
-            <label>Heslo</label>
-            <input asp-for="Password" type="password" />
-        </div>
-        <button type="submit">Registrovat</button>
-    </form>
-    <p>@ViewBag.Message</p>
-
-    <a href="/Home/Index" class="home-button">Zpět</a>
+    <div class="container">
+        <h1>Registrace</h1>
+        <form method="post">
+            <input asp-for="Username" placeholder="Uživatelské jméno" />
+            <input asp-for="Password" type="password" placeholder="Heslo" />
+            <button type="submit">Registrovat</button>
+        </form>
+        <a href="/Home/Index" class="home-button">Zpět na hlavní stránku</a>
+    </div>
 </body>
-
 </html>
