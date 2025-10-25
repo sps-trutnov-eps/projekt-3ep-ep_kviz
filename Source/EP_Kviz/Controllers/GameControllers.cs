@@ -13,8 +13,17 @@ public class GamesController : Controller
 
     public IActionResult Vyber()
     {
+        int? userId = HttpContext.Session.GetInt32("UserId");
+        if (userId == null)
+        {
+            // Nepřihlášený uživatel, přesměrování na login
+            return RedirectToAction("Login", "Home");
+        }
+
+        ViewBag.UserId = userId.Value;
         return View();
     }
+
 
     public IActionResult OneVOne(int pid)
     {
