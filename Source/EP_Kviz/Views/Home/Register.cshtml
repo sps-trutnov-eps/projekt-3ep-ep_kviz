@@ -1,4 +1,6 @@
-﻿@{
+﻿@model RegisterViewModel
+
+@{
     ViewData["Title"] = "EPKvíz - Registrace";
     Layout = null;
 }
@@ -71,12 +73,12 @@
             font-size: 1.2rem;
         }
 
-            form div {
-                display: flex;
-                flex-direction: column;
-                align-items: stretch;
-                gap: 0.5rem;
-            }
+        form div {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.5rem;
+        }
 
         label {
             font-size: 1.1em;
@@ -97,11 +99,11 @@
             transition: box-shadow 0.2s;
         }
 
-            input[type="text"]:focus,
-            input[type="password"]:focus,
-            input[type="email"]:focus {
-                box-shadow: 0 0 12px rgba(0,255,255,0.3);
-            }
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        input[type="email"]:focus {
+            box-shadow: 0 0 12px rgba(0,255,255,0.3);
+        }
 
         button[type="submit"] {
             margin-top: 0.5em;
@@ -117,41 +119,57 @@
             transition: transform .15s, box-shadow .15s;
         }
 
-            button[type="submit"]:hover {
-                transform: scale(1.05);
-                box-shadow: 0 0 18px rgba(0,242,255,0.8);
-            }
+        button[type="submit"]:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 18px rgba(0,242,255,0.8);
+        }
 
         p {
             margin-top: 1em;
             font-size: 1.1em;
+      }
+
+        /* Přidání společných stylů pro formulář */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 300px;
         }
-    </style>
 
+        input {
+            padding: 0.7rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 0.7rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(180deg,#00f2ff,#0088ff);
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+            button:hover {
+                background: linear-gradient(180deg,#0088ff,#00f2ff);
+            }
+</style>
 </head>
-
 <body>
-    @model RegisterViewModel
-
-    @{
-        ViewData["Title"] = "Registrace";
-    }
-
-    <h3>Registrace</h3>
-    <form method="post">
-        <div>
-            <label>Uživatelské jméno</label>
-            <input asp-for="Username" />
-        </div>
-        <div>
-            <label>Heslo</label>
-            <input asp-for="Password" type="password" />
-        </div>
-        <button type="submit">Registrovat</button>
-    </form>
-    <p>@ViewBag.Message</p>
-
-    <a href="/Home/Index" class="home-button">Zpět</a>
+    <div class="container">
+        <h1>Registrace</h1>
+        <form method="post">
+            <input asp-for="Username" placeholder="Uživatelské jméno" />
+            <input asp-for="Password" type="password" placeholder="Heslo" />
+            <button type="submit">Registrovat</button>
+        </form>
+        <a href="/Home/Index" class="home-button">Zpět na hlavní stránku</a>
+    </div>
 </body>
-
 </html>
