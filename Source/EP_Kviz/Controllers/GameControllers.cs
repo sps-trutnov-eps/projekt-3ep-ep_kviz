@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using EP_Kviz.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 public class GamesController : Controller
 {
@@ -25,6 +28,7 @@ public class GamesController : Controller
             GameId = gameId,
             Mode = "1v1",
             Players = new List<int> { pid },
+            Scores = new Dictionary<int, int> { { pid, 0 } },
             CreatedAt = DateTime.Now
         };
 
@@ -42,6 +46,7 @@ public class GamesController : Controller
             GameId = gameId,
             Mode = "2v2",
             Players = new List<int> { pid },
+            Scores = new Dictionary<int, int> { { pid, 0 } },
             CreatedAt = DateTime.Now
         };
 
@@ -59,6 +64,7 @@ public class GamesController : Controller
             GameId = gameId,
             Mode = "Procvičení",
             Players = new List<int> { pid },
+            Scores = new Dictionary<int, int> { { pid, 0 } },
             CreatedAt = DateTime.Now
         };
 
@@ -72,10 +78,15 @@ public class GamesController : Controller
         if (_cache.TryGetValue($"game_{gameId}", out GameSession game))
         {
             if (!game.Players.Contains(pid))
-            {
                 game.Players.Add(pid);
-                _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
-            }
+
+            if (game.Scores == null)
+                game.Scores = new Dictionary<int, int>();
+
+            if (!game.Scores.ContainsKey(pid))
+                game.Scores[pid] = 0;
+
+            _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
 
             return RedirectToAction("Play", new { gameId = gameId, pid = pid });
         }
@@ -114,8 +125,39 @@ public class GamesController : Controller
             {
                 playerCount = game.Players.Count,
                 players = game.Players,
-                mode = game.Mode
+                mode = game.Mode,
+                scores = game.Scores ?? new Dictionary<int, int>()
             });
+        }
+
+        return Json(new { error = "Game not found" });
+    }
+
+    // Simple test endpoint — increases pid's score by 1
+    [HttpGet]
+    public IActionResult AddPoint(int gameId, int pid)
+    {
+        if (_cache.TryGetValue($"game_{gameId}", out GameSession game))
+        {
+            lock (game)
+            {
+                if (game.Scores == null)
+                    game.Scores = new Dictionary<int, int>();
+
+                if (!game.Scores.ContainsKey(pid))
+                    game.Scores[pid] = 0;
+
+                game.Scores[pid]++;
+
+                _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
+
+                return Json(new
+                {
+                    success = true,
+                    players = game.Players,
+                    scores = game.Scores
+                });
+            }
         }
 
         return Json(new { error = "Game not found" });
