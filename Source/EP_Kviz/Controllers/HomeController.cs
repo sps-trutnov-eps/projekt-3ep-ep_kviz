@@ -82,13 +82,17 @@ namespace EP_Kviz.Controllers
             var user = users.FirstOrDefault(u => u.Username == model.Username && u.Password == model.Password);
             if (user != null)
             {
-                ViewBag.Message = $"Pøihlášení úspìšné! Vaše ID: {user.Id}";
+                // Uložení ID do session
+                HttpContext.Session.SetInt32("UserId", user.Id);
+
+                // Pøesmìrování na výbìr hry
+                return RedirectToAction("Vyber", "Games");
             }
             else
             {
                 ViewBag.Message = "Špatné jméno nebo heslo.";
+                return View();
             }
-            return View();
         }
 
 

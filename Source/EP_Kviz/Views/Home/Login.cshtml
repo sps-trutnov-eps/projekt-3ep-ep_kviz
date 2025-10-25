@@ -34,6 +34,7 @@
             font-family: "Orbitron", sans-serif;
             background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
             color: #fff;
+            font-size: 1.25rem; /* Zvětšení základní velikosti písma */
         }
 
         /* Keep container layout but remove the visual "frame" */
@@ -105,8 +106,72 @@
         .home-button:hover {
             transform: scale(1.07);
             box-shadow: 0 0 18px rgba(0,242,255,0.8);
+            }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            min-width: 320px;
+            margin-top: 1.5rem;
+            font-size: 1.2rem;
+        }
+
+        form div {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-size: 1.1em;
+            margin-bottom: 0.2em;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            padding: 0.7em 1em;
+            border-radius: 6px;
+            border: none;
+            font-size: 1.1em;
+            background: #1e293b;
+            color: #fff;
+            box-shadow: 0 0 6px rgba(0,255,255,0.1);
+            outline: none;
+            transition: box-shadow 0.2s;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            box-shadow: 0 0 12px rgba(0,255,255,0.3);
+        }
+
+        button[type="submit"] {
+            margin-top: 0.5em;
+            padding: 0.8em 1.5em;
+            border-radius: 8px;
+            border: none;
+            background: linear-gradient(180deg,#00f2ff,#0088ff);
+            color: #fff;
+            font-size: 1.2em;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0,136,255,0.5);
+            transition: transform .15s, box-shadow .15s;
+        }
+
+        button[type="submit"]:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 18px rgba(0,242,255,0.8);
+        }
+
+        p {
+            margin-top: 1em;
+            font-size: 1.1em;
         }
     </style>
+
 </head>
 <body>
     <div class="container">
