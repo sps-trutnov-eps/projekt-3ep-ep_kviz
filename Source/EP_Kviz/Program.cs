@@ -8,6 +8,7 @@ builder.WebHost.ConfigureKestrel(options =>
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddMemoryCache(); 
+builder.Services.AddSingleton<EP_Kviz.Services.GameManager>();
 
 var app = builder.Build();
 
