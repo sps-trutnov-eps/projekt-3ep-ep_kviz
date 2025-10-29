@@ -1,4 +1,8 @@
-﻿<h1>Výběr herního módu</h1>
+﻿@{
+    ViewData["Title"] = "Výběr herního módu";
+}
+
+<h1>Výběr herního módu</h1>
 <a href="/Home/Index" class="home-button">Zpět</a>
 
 @if (TempData["Error"] != null)
@@ -8,12 +12,13 @@
     </div>
 }
 
-<form id="gameForm">
+<form id="gameForm" onsubmit="return false;">
     <label for="playerId_display">Tvé ID:</label>
 
     <!-- Zobrazovací pole (uživatel ho nemůže editovat) -->
     <input type="number"
            id="playerId_display"
+           class="uzivatelske_ID"
            value="@ViewBag.UserId"
            readonly
            disabled
@@ -32,54 +37,72 @@
     <h3>Nebo se připoj k existující hře:</h3>
     <label for="joinGameId">ID hry:</label>
     <input type="number" id="joinGameId" name="joinGameId" min="100000" max="999999" style="margin-bottom:0.5rem;" />
-    <button type="button" class="button button-secondary" onclick="joinGame()">Připojit se</button>
+
+    <!-- tlačítko je zpočátku disabled a šedé, JS ho aktivuje jakmile je v poli něco napsáno -->
+    <button id="joinButton" type="button" class="button-secondary" onclick="joinGame()">Připojit se</button>
 </form>
 
 <script>
-    function goToMode(mode) {
-        const pid = document.getElementById('playerId').value;
-        if (!pid) {
-            alert('Zadej prosím své ID.');
-            return;
+document.addEventListener('DOMContentLoaded', function () {
+    const joinInput = document.getElementById('joinGameId');
+    const joinBtn = document.getElementById('joinButton');
+
+    function updateJoinButtonState() {
+        if (!joinInput || !joinBtn) return;
+        const val = (joinInput.value || '').toString().trim();
+
+        // zachováme velikost / padding stejný, jen měníme barvu přes třídy
+        if (val.length > 0) {
+            joinBtn.classList.remove('button-secondary');
+            joinBtn.classList.add('button'); // modrý vzhled
+        } else {
+            joinBtn.classList.remove('button');
+            joinBtn.classList.add('button-secondary'); // šedý vzhled
         }
-        window.location.href = `/Games/${mode}?pid=${encodeURIComponent(pid)}`;
     }
 
-    function joinGame() {
-        const pid = document.getElementById('playerId').value;
-        const gameId = document.getElementById('joinGameId').value;
+    updateJoinButtonState();
 
-        if (!pid) {
-            alert('Zadej prosím své ID.');
-            return;
+    joinInput?.addEventListener('input', updateJoinButtonState);
+    joinInput?.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (!joinBtn.disabled) joinBtn.click();
         }
-        if (!gameId) {
-            alert('Zadej prosím ID hry.');
-            return;
-        }
+    });
+});
 
-        window.location.href = `/Games/Join?gameId=${encodeURIComponent(gameId)}&pid=${encodeURIComponent(pid)}`;
+// Funkce pro vytvoření módu
+function goToMode(mode) {
+    const pid = document.getElementById('playerId')?.value;
+    if (!pid) {
+        alert('Zadej prosím své ID.');
+        return;
     }
+    window.location.href = `/Games/${mode}?pid=${encodeURIComponent(pid)}`;
+}
+
+// Funkce pro připojení se do hry
+function joinGame() {
+    const pid = document.getElementById('playerId')?.value;
+    const gameId = document.getElementById('joinGameId')?.value;
+
+    if (!pid) {
+        alert('Zadej prosím své ID.');
+        return;
+    }
+    if (!gameId) {
+        alert('Zadej prosím ID hry.');
+        return;
+    }
+
+    window.location.href = `/Games/Join?gameId=${encodeURIComponent(gameId)}&pid=${encodeURIComponent(pid)}`;
+}
 </script>
 
 <style>
-    .container {
-        max-width: 600px;
-        margin: 0 auto;
-        padding: 2rem;
-        background: #f9f9f9;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .button-group {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-        margin-bottom: 2rem;
-    }
-
-    .button {
+    /* sdílené vlastnosti pro obě třídy, aby tlačítka měnila jen barvu */
+    .button, .button-secondary {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -88,74 +111,43 @@
         border-radius: 12px;
         font-size: 1.2rem;
         font-weight: 700;
-        background: linear-gradient(180deg,#00f2ff,#0088ff);
         color: #fff;
         box-shadow: 0 0 14px rgba(0,136,255,0.6);
-        transition: transform .15s ease, box-shadow .15s ease;
+        transition: transform .15s ease, box-shadow .15s ease, opacity .15s;
         border: none;
         cursor: pointer;
         width: 100%;
+        min-height: 48px; /* zajišťuje stejnou výšku i když disabled */
+        box-sizing: border-box;
     }
 
-        .button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(0,242,255,0.9);
-        }
+    /* modrý vzhled */
+    .button {
+        background: linear-gradient(180deg,#00f2ff,#0088ff);
+        box-shadow: 0 0 14px rgba(0,136,255,0.6);
+    }
+    .button:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(0,242,255,0.9); }
+    .button:active { transform: scale(0.97); }
 
-        .button:active {
-            transform: scale(0.97);
-        }
-
+    /* šedý vzhled (pouze barva) */
     .button-secondary {
         background: linear-gradient(180deg,#6c757d,#495057);
         box-shadow: 0 0 14px rgba(108,117,125,0.6);
     }
+    .button-secondary:hover { box-shadow: 0 0 20px rgba(108,117,125,0.9); }
 
-        .button-secondary:hover {
-            box-shadow: 0 0 20px rgba(108,117,125,0.9);
-        }
-
-    label {
-        margin-bottom: 0.5rem;
-        font-weight: 500;
+    /* vzhled disabled - zachovává velikost a padding */
+    .button[disabled], .button-secondary[disabled] {
+        opacity: 0.85;
+        cursor: not-allowed;
+        transform: none !important;
+        box-shadow: none !important;
     }
 
-    input[type="number"] {
-        width: 100%;
-        padding: 0.75rem;
-        border-radius: 8px;
-        border: 1px solid #fff;
-        margin-bottom: 1rem;
-        font-size: 1rem;
-        color: #ccc;
-    }
-
-    h3 {
-        margin-top: 1.5rem;
-        margin-bottom: 0.5rem;
-        font-size: 1.2rem;
-        color: #ccc;
-    }
-
-    
-    .home-button {
-        position: absolute;
-        top: 24px;
-        right: 32px;
-        padding: 0.7rem 1.4rem;
-        border-radius: 8px;
-        font-size: 1rem;
-        font-weight: 700;
-        background: linear-gradient(180deg,#00f2ff,#0088ff);
-        color: #fff;
-        text-decoration: none;
-        box-shadow: 0 0 10px rgba(0,136,255,0.5);
-        transition: transform .15s, box-shadow .15s;
-        z-index: 10;
-    }
-
-    .home-button:hover {
-        transform: scale(1.07);
-        box-shadow: 0 0 18px rgba(0,242,255,0.8);
-    }
+    /* ostatní styly (ponecháno) */
+    .container { max-width: 600px; margin: 0 auto; padding: 2rem; }
+    label { margin-bottom: 0.5rem; font-weight: 500; color: #ccc; display:block; }
+    input[type="number"] { width: 100%; padding: 0.75rem; border-radius: 8px; border: 1px solid #fff; margin-bottom: 1rem; font-size: 1rem; }
+    .uzivatelske_ID { color: white; }
+    .home-button { position:absolute; top:24px; right:32px; padding:.7rem 1.4rem; border-radius:8px; font-weight:700; background:linear-gradient(180deg,#00f2ff,#0088ff); color:#fff; text-decoration:none; box-shadow:0 0 10px rgba(0,136,255,0.5); }
 </style>
