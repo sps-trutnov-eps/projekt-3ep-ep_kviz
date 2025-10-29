@@ -52,22 +52,29 @@ namespace EP_Kviz.Controllers
         [HttpPost]
         public IActionResult Register(RegisterViewModel model)
         {
-            if (users.Any(u => u.Username == model.Username))
+            if (ModelState.IsValid)
             {
-                ViewBag.Message = "Uživatel již existuje.";
+                if (users.Any(u => u.Username == model.Username))
+                {
+                    ViewBag.Message = "Uživatel již existuje.";
+                    return View();
+                }
+
+                var user = new User
+                {
+                    Id = nextId++,
+                    Username = model.Username,
+                    Password = model.Password
+                };
+                users.Add(user);
+
+                ViewBag.RegistrationSuccess = true;
+                ModelState.Clear(); // Vyèistí formuláø
                 return View();
             }
-
-            var user = new User
-            {
-                Id = nextId++,
-                Username = model.Username,
-                Password = model.Password
-            };
-            users.Add(user);
-
-            ViewBag.Message = "Registrace úspìšná!";
-            return View();
+            
+            ViewBag.RegistrationSuccess = false;
+            return View(model);
         }
 
         [HttpGet]
