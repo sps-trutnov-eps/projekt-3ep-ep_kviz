@@ -164,9 +164,17 @@
 <body>
     <div class="container">
         <h1>Registrace</h1>
+        @if (ViewBag.RegistrationSuccess == true)
+        {
+            <div style="color: #00ffae; background: #112; border-radius: 8px; padding: 1em; margin-bottom: 1em; font-weight: bold;">
+                Úspěšně jste byli zaregistrováni!
+            </div>
+        }
         <form method="post">
             <input asp-for="Username" placeholder="Uživatelské jméno" />
             <input asp-for="Password" type="password" placeholder="Heslo" />
+            <input asp-for="ConfirmPassword" type="password" placeholder="Potvrzení hesla" />
+            <span asp-validation-for="ConfirmPassword" style="color: #ff6b6b;"></span>
             <button type="submit">Registrovat</button>
         </form>
         <a href="/Home/Index" class="home-button">Zpět na hlavní stránku</a>
