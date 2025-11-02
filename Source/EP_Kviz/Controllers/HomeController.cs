@@ -93,7 +93,7 @@ namespace EP_Kviz.Controllers
                 HttpContext.Session.SetInt32("UserId", user.Id);
 
                 // Pøesmìrování na výbìr hry
-                return RedirectToAction("Vyber", "Games");
+                return RedirectToAction("Index");
             }
             else
             {
