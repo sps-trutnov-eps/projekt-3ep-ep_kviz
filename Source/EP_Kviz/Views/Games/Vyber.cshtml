@@ -124,4 +124,26 @@
         font-size: 1.2rem;
         color: #333;
     }
+
+    .home-button {
+        position: absolute;
+        top: 24px;
+        right: 32px;
+        padding: 0.7rem 1.4rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 700;
+        background: linear-gradient(180deg,#00f2ff,#0088ff);
+        color: #fff;
+        text-decoration: none;
+        box-shadow: 0 0 10px rgba(0,136,255,0.5);
+        transition: transform .15s, box-shadow .15s;
+        z-index: 10;
+    }
+
+        .home-button:hover {
+            transform: scale(1.07);
+            box-shadow: 0 0 18px rgba(0,242,255,0.8);
+        }
 </style>
+    <a href="/Home/Index" class="home-button">Zpět na hlavní stránku</a>
