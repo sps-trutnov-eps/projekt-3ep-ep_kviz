@@ -4,6 +4,7 @@ using EP_Kviz.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EP_Kviz.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251105142501_TestSeedDatabase7")]
+    partial class TestSeedDatabase7
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -91,15 +94,15 @@ namespace EP_Kviz.Migrations
                         {
                             Id = "1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "88fa1547-df41-45fd-8d3d-9266c07e2ba0",
+                            ConcurrencyStamp = "283a1202-5d26-4543-9efc-c148ce13f405",
                             Email = "test@epkviz.cz",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "TEST@EPKVIZ.CZ",
                             NormalizedUserName = "TEST@EPKVIZ.CZ",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJ8SHVpTXGhxT+OLvVlCJHNvbKGJWQvnNzVaLkOqBfJQXZBGHgBbU0qU9zZ3lA3fxA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDuOCZmStsr8TcxJ03dVXSGUVuRu0GuIVa3sO8Ch6yRZzdYsIywds7MF/ifyjw0i8w==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "fd21fb12-f4a5-402a-9d90-ce2af2301679",
+                            SecurityStamp = "e023d81a-3bc3-4a83-a36f-ed9e5ad544db",
                             TwoFactorEnabled = false,
                             UserName = "test@epkviz.cz"
                         });
