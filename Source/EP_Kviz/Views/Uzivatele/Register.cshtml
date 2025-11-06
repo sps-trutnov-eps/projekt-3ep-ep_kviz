@@ -93,6 +93,14 @@
             button:hover {
                 background: linear-gradient(180deg,#0088ff,#00f2ff);
             }
+
+            .errorText{
+                background-color:   lightcoral;
+            }
+
+
+
+
     </style>
 </head>
 <body>
@@ -101,7 +109,11 @@
 
     @if (ViewBag.Message != null)
     {
-        <div style="margin-bottom:15px; padding:10px; background:#0066cc; border-radius:6px; text-align:center;">
+
+        @* START FORMÁTOVÁNÍ *@
+
+
+        <div class="errorText">
             @ViewBag.Message
         </div>
     }
@@ -121,17 +133,21 @@
          
         </div>
 
-        <div class="form-group">
+        <div class="radekVyplneni">
             <label asp-for="Password">Heslo</label>
             <input asp-for="Password" class="form-control" type="password" />
   
         </div>
         <button type="submit" class="btn btn-primary">Registrovat</button>
 
-        <small class="form-text text-muted">
+        <small class="pravidlaHesla">
             Heslo musí obsahovat: velké písmeno, malé písmeno, číslo, speciální znak a minimálně 6 znaků
         </small>
+
+     
     </form>
+
+        @* KONEC FORMÁTVÁNÍ *@
 
     @section Scripts {
         @{
