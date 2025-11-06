@@ -26,12 +26,25 @@ namespace EP_Kviz.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (model == null) throw new ArgumentNullException(nameof(model));
-            if (model == null || string.IsNullOrEmpty(model.Username) || string.IsNullOrEmpty(model.Password))
+            if (model == null || string.IsNullOrEmpty(model.Username) || string.IsNullOrEmpty(model.Password) || string.IsNullOrEmpty(model.Email))
             {
                 ViewBag.Message = "Neplatné údaje.";
                 return View();
             }
+
+
+
+            //Kontrola jestli username existuje
+            var existingUser = await _userManager.FindByNameAsync(model.Username);
+            if (existingUser != null)
+            {
+                ViewBag.Message = "Uživatelské jméno již existuje.";
+                return View(model);
+            }
+
+
+
+
             var newuser = new UzivateleModel
             {
                 UserName = model.Username,

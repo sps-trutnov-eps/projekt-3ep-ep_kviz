@@ -4,49 +4,139 @@
     ViewData["Title"] = "EPKvíz - Registrace";
     Layout = null;
 }
-<h2>Registrace nového uživatele</h2>
 
-@if (ViewBag.Message != null)
-{
-    <div class="alert @(ViewBag.Message.Contains("úspěšná") ? "alert-success" : "alert-danger")">
-        @ViewBag.Message
-    </div>
-}
+<!doctype html>
+<html lang="cs">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>@ViewData["Title"]</title>
 
-<form asp-action="Register" method="post">
-    <div class="form-group">
-        <label asp-for="Username">Uživatelské jméno</label>
-        <input asp-for="Username" class="form-control" />
-        <span asp-validation-for="Username" class="text-danger"></span>
-    </div>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
 
-    <div class="form-group">
-        <label asp-for="Email">Email</label>
-        <input asp-for="Email" class="form-control" type="email" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-    <div class="form-group">
-        <label asp-for="Password">Heslo</label>
-        <input asp-for="Password" class="form-control" type="password" />
-        <span asp-validation-for="Password" class="text-danger"></span>
+        html, body {
+            height: 100%;
+            width: 100%;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            font-family: "Orbitron", sans-serif;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            color: #fff;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            text-shadow: 0 0 12px rgba(0,255,255,0.6);
+        }
+
+        .home-button {
+            position: absolute;
+            top: 24px;
+            right: 32px;
+            padding: 0.7rem 1.4rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            background: linear-gradient(180deg,#00f2ff,#0088ff);
+            color: #fff;
+            text-decoration: none;
+            box-shadow: 0 0 10px rgba(0,136,255,0.5);
+            transition: transform .15s, box-shadow .15s;
+            z-index: 10;
+        }
+
+            .home-button:hover {
+                transform: scale(1.07);
+                box-shadow: 0 0 18px rgba(0,242,255,0.8);
+            }
+
+        /* Přidání společných stylů pro formulář */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 300px;
+        }
+
+        input {
+            padding: 0.7rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 0.7rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(180deg,#00f2ff,#0088ff);
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+            button:hover {
+                background: linear-gradient(180deg,#0088ff,#00f2ff);
+            }
+    </style>
+</head>
+<body>
+    <h2>Registrace nového uživatele</h2>
+
+
+    @if (ViewBag.Message != null)
+    {
+        <div style="margin-bottom:15px; padding:10px; background:#0066cc; border-radius:6px; text-align:center;">
+            @ViewBag.Message
+        </div>
+    }
+
+
+    <form asp-action="Register" method="post">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Username">Uživatelské jméno</label>
+            <input asp-for="Username" class="form-control" />
+           
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email">Email</label>
+            <input asp-for="Email" class="form-control" type="email" />
+         
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Password">Heslo</label>
+            <input asp-for="Password" class="form-control" type="password" />
+  
+        </div>
+        <button type="submit" class="btn btn-primary">Registrovat</button>
+
         <small class="form-text text-muted">
             Heslo musí obsahovat: velké písmeno, malé písmeno, číslo, speciální znak a minimálně 6 znaků
         </small>
-    </div>
+    </form>
 
-    <div class="form-group">
-        <label asp-for="ConfirmPassword">Potvrzení hesla</label>
-        <input asp-for="ConfirmPassword" class="form-control" type="password" />
-        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Registrovat</button>
-    <a asp-action="Login" class="btn btn-secondary">Již máte účet? Přihlaste se</a>
-</form>
-
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
     }
-}
+</body>
+</html>
