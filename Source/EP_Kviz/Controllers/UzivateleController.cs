@@ -59,8 +59,7 @@ namespace EP_Kviz.Controllers
                 return View();
             }
 
-            ViewBag.Message = "Registrace úspěšná!";
-            return View();
+            return RedirectToAction("Login", "Uzivatele");
         }
 
         [HttpGet]
@@ -100,6 +99,8 @@ namespace EP_Kviz.Controllers
             return RedirectToAction("Index", "Home");
         }
 
+
+        [HttpGet]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
