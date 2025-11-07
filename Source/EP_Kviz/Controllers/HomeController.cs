@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using EP_Kviz.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EP_Kviz.Controllers
 {
@@ -15,6 +16,8 @@ namespace EP_Kviz.Controllers
 
         public IActionResult Index()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ViewBag.Message = userId;
             return View();
         }
 
