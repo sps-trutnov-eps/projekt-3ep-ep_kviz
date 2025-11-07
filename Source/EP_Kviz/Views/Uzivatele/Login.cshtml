@@ -111,11 +111,29 @@
 <body>
     <div class="container">
         <h1>Přihlášení</h1>
-        <form method="post">
+@*         <form method="post">
             <input asp-for="Username" placeholder="Uživatelské jméno" />
             <input asp-for="Password" type="password" placeholder="Heslo" />
             <button type="submit">Přihlásit</button>
+        </form> *@
+
+        <form asp-action="Login" method="post">
+            <div class="form-group">
+                <label asp-for="Username">Uživatelské jméno</label>
+                <input asp-for="Username" class="form-control" />
+
+            </div>
+            <div class="form-group">
+                <label asp-for="Password">Uživatelské jméno</label>
+                <input asp-for="Password" class="form-control" />
+
+            </div>
+            <button type="submit" class="btn btn-primary">Přihlásit se</button>
+
         </form>
+
+
+
     </div>
 
     <a href="/Home/Index" class="home-button">Zpět na hlavní stránku</a>
