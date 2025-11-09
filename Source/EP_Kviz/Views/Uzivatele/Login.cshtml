@@ -85,7 +85,7 @@
                 box-shadow: 0 0 18px rgba(0,242,255,0.8);
             }
 
-        /* Make the back button match Register: positioned top-right */
+
         .home-button {
             position: absolute;
             top: 24px;
@@ -106,22 +106,57 @@
                 transform: scale(1.07);
                 box-shadow: 0 0 18px rgba(0,242,255,0.8);
             }
+
+        .errorText {
+            background-color: orangered;
+            color: white;
+            padding: 1rem 1rem 1rem 1rem;
+            border-radius: 8px;
+            font-weight: bolder;
+            font-size: 1.2rem;
+        }
+
+        .text-danger {
+            display: block;
+            margin-top: 0.2rem;
+            padding: 0.2rem 0.2rem 0.2rem 0.2rem;
+            background-color: white;
+            color: orangered;
+            border-radius: 8px;
+            font-weight: bolder;
+        }
+
+        .text-danger:empty {
+            display: none;
+        }
+
+        .register-button{
+            display: block;
+            font-size: 1.1rem;
+            color: white;
+            margin-top: 1rem;
+        }
+
     </style>
+
 </head>
 <body>
     <div class="container">
         <h1>Přihlášení</h1>
 
 
-        @if (ViewBag.Message != null)
-        {
-            <div class="errorText">
-                @ViewBag.Message
-            </div>
-        }
+
 
 
         <form asp-action="Login" method="post">
+
+            @if (ViewBag.Message != null)
+            {
+                <div class="errorText">
+                    @ViewBag.Message
+                </div>
+            }
+
             <div class="form-group">
                 <label asp-for="Username">Uživatelské jméno</label>
                 <input asp-for="Username" class="form-control" />
@@ -135,7 +170,7 @@
             <button type="submit" class="btn btn-primary">Přihlásit se</button>
 
         </form>
-        <a href="/Uzivatele/Register" class="register-button">Registrace</a>
+        <a href="/Uzivatele/Register" class="register-button">Nebo se registrujte</a>
 
 
     </div>
