@@ -1,4 +1,7 @@
-﻿namespace EP_Kviz.Models
+using System;
+using System.Collections.Generic;
+
+namespace EP_Kviz.Models
 {
     public class Cell
     {
@@ -21,7 +24,8 @@
         public int GameId { get; set; }
         public string Mode { get; set; } = "";
         public List<int> Players { get; set; } = new List<int>();
-        public DateTime CreatedAt { get; set; }
+        public Dictionary<int, int> Scores { get; set; } = new Dictionary<int, int>();
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public bool IsActive { get; set; } = true;
 
         // Nové pro hru
@@ -89,6 +93,16 @@
 
             // 1v1 - střídání mezi dvěma hráči
             return Players.First(p => p != currentPlayerId);
+        }
+
+        // Convenience helper used by controllers / services
+        public void EnsurePlayer(int playerId)
+        {
+            if (!Players.Contains(playerId))
+                Players.Add(playerId);
+
+            if (!Scores.ContainsKey(playerId))
+                Scores[playerId] = 0;
         }
     }
 }

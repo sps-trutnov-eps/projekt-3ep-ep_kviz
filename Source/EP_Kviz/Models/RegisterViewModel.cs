@@ -1,16 +1,20 @@
 using System.ComponentModel.DataAnnotations;
 
-public class RegisterViewModel
+namespace EP_Kviz.Models
 {
-    [Required]
-    public string Username { get; set; }
+    public class RegisterViewModel
+    {
+        [Required(ErrorMessage = "Uï¿½ivatelskï¿½ jmï¿½no je povinnï¿½")]
+        public string Username { get; set; }
 
-    [Required]
-    [DataType(DataType.Password)]
-    public string Password { get; set; }
+        [Required(ErrorMessage = "Email je povinnï¿½")]
+        [EmailAddress(ErrorMessage = "Neplatnï¿½ email")]
+        public string Email { get; set; }
 
-    [Required]
-    [DataType(DataType.Password)]
-    [Compare("Password", ErrorMessage = "Hesla se neshodují.")]
-    public string ConfirmPassword { get; set; }
+        [Required(ErrorMessage = "Heslo je povinnï¿½")]
+        [DataType(DataType.Password)]
+        [MinLength(6, ErrorMessage = "Heslo musï¿½ mï¿½t alespoï¿½ 6 znakï¿½")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$", ErrorMessage = "Heslo musï¿½ obsahovat velkï¿½ pï¿½smeno, malï¿½ pï¿½smeno, ï¿½ï¿½slo a speciï¿½lnï¿½ znak.")]
+        public string Password { get; set; }
+    }
 }

@@ -1,9 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using EP_Kviz.Models;
 using System.Text;
 using System.Text.Json;
 using System.IO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 public class GamesController : Controller
 {
@@ -37,6 +40,7 @@ public class GamesController : Controller
             GameId = gameId,
             Mode = "1v1",
             Players = new List<int> { pid },
+            Scores = new Dictionary<int, int> { { pid, 0 } },
             CreatedAt = DateTime.Now
         };
 
@@ -53,6 +57,7 @@ public class GamesController : Controller
             GameId = gameId,
             Mode = "2v2",
             Players = new List<int> { pid },
+            Scores = new Dictionary<int, int> { { pid, 0 } },
             CreatedAt = DateTime.Now
         };
 
@@ -72,6 +77,7 @@ public class GamesController : Controller
             GameId = gameId,
             Mode = "Procvičení",
             Players = new List<int> { pid },
+            Scores = new Dictionary<int, int> { { pid, 0 } },
             CreatedAt = DateTime.Now
         };
 
@@ -94,7 +100,6 @@ public class GamesController : Controller
             }
 
             if (!game.Players.Contains(pid))
-            {
                 game.Players.Add(pid);
                 
                 // Přiřazení týmu pro 2v2
@@ -112,6 +117,14 @@ public class GamesController : Controller
 
                 _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
             }
+
+            if (game.Scores == null)
+                game.Scores = new Dictionary<int, int>();
+
+            if (!game.Scores.ContainsKey(pid))
+                game.Scores[pid] = 0;
+
+            _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
 
             return RedirectToAction("Play", new { gameId = gameId, pid = pid });
         }
@@ -231,6 +244,7 @@ public class GamesController : Controller
                     game.PendingQuestion.CellId, 
                     game.PendingQuestion.AskedByPlayerId 
                 } : null
+                scores = game.Scores ?? new Dictionary<int, int>()
             });
         }
         return Json(new { error = "Game not found" });

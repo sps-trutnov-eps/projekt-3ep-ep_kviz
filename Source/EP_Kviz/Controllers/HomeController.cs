@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using EP_Kviz.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EP_Kviz.Controllers
 {
@@ -15,6 +16,15 @@ namespace EP_Kviz.Controllers
 
         public IActionResult Index()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+
+                ViewBag.Message = "Uï¿½ivatel nenï¿½ pï¿½ihlï¿½en";
+            }
+            else {
+                ViewBag.Message = "Uï¿½ivatel je pï¿½ihlï¿½enï¿½";
+            }
             return View();
         }
 
@@ -38,16 +48,9 @@ namespace EP_Kviz.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-            
 
-        private static List<User> users = new();
-        private static int nextId = 1;
+        
 
-        [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
 
         [HttpPost]
         public IActionResult Register(RegisterViewModel model)
@@ -56,7 +59,7 @@ namespace EP_Kviz.Controllers
             {
                 if (users.Any(u => u.Username == model.Username))
                 {
-                    ViewBag.Message = "Uživatel již existuje.";
+                    ViewBag.Message = "Uï¿½ivatel jiï¿½ existuje.";
                     return View();
                 }
 
@@ -69,7 +72,7 @@ namespace EP_Kviz.Controllers
                 users.Add(user);
 
                 ViewBag.RegistrationSuccess = true;
-                ModelState.Clear(); // Vyèistí formuláø
+                ModelState.Clear(); // Vyï¿½istï¿½ formulï¿½ï¿½
                 return View();
             }
             
@@ -89,15 +92,15 @@ namespace EP_Kviz.Controllers
             var user = users.FirstOrDefault(u => u.Username == model.Username && u.Password == model.Password);
             if (user != null)
             {
-                // Uložení ID do session
+                // Uloï¿½enï¿½ ID do session
                 HttpContext.Session.SetInt32("UserId", user.Id);
 
-                // Pøesmìrování na výbìr hry
+                // Pï¿½esmï¿½rovï¿½nï¿½ na vï¿½bï¿½r hry
                 return RedirectToAction("Index");
             }
             else
             {
-                ViewBag.Message = "Špatné jméno nebo heslo.";
+                ViewBag.Message = "ï¿½patnï¿½ jmï¿½no nebo heslo.";
                 return View();
             }
         }
