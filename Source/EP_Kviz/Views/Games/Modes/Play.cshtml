@@ -1,53 +1,228 @@
 ﻿@{
     var gameId = ViewBag.GameId;
-    var mode = ViewBag.Mode;
     var playerId = ViewBag.PlayerId;
-    var players = ViewBag.Players as List<int>;
-    var playerCount = ViewBag.PlayerCount;
+    var mode = ViewBag.Mode;
 }
 
 <h1>Mód: @mode</h1>
 
 <div style="background: #8AAAEB; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
     <p><strong>ID hry:</strong> <span id="gameId">@gameId</span></p>
-    <p><strong>Tvoje ID:</strong> @playerId</p>
-    <p><strong>Počet hráčů:</strong> <span id="playerCount">@playerCount</span></p>
-    <p><strong>Hráči v lobbyi:</strong> <span id="playerList">@string.Join(", ", players)</span></p>
+    <p><strong>Tvoje ID:</strong> <span id="myId">@playerId</span></p>
+    <p><strong>Hráči v lobbyi:</strong> <span id="playerList"></span></p>
 </div>
 
-<div style="background: #405A99; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-    <p>🔗 <strong>Sdílej toto ID s přáteli:</strong> <code style="font-size: 1.5rem; font-weight: bold; background: #8AAAEB;">@gameId</code></p>
-    <p>Můžou se připojit na hlavní stránce zadáním tohoto ID.</p>
+<div id="gridWrapper" style="display:grid; grid-template-columns: repeat(5, 1fr); gap:12px; max-width:420px; margin-bottom:1rem;">
+    @* Místo pro 25 tlačítek; budou dynamicky naplněna JSem *@
 </div>
 
-<div>
-    <h2>Hra začíná...</h2>
-    <p>Zde bude vaše herní logika</p>
+<div id="questionBox" style="display:none; margin-top:1rem; background:#222; color:#fff; padding:1rem; border-radius:8px;">
+    <div id="questionText" style="margin-bottom:0.5rem;"></div>
+    <div id="answerArea" style="display:flex; gap:.5rem;">
+        <input id="answerInput" type="text" placeholder="Tvoje odpověď" style="flex:1;padding:.5rem;border-radius:4px;border:1px solid #ccc;" />
+        <button id="submitAnswerBtn" class="button" style="min-width:110px">Odeslat</button>
+    </div>
 </div>
 
 <script>
-    // Automatické obnovování informací každou sekundu
-    setInterval(async function() {
-        try {
-            const gameId = document.getElementById('gameId').textContent;
-            const response = await fetch(`/Games/GetGameInfo?gameId=${gameId}`);
-            const data = await response.json();
+    const gameIdElem = document.getElementById('gameId');
+    const myId = parseInt(document.getElementById('myId').textContent, 10);
+    const gridWrapper = document.getElementById('gridWrapper');
+    const questionBox = document.getElementById('questionBox');
+    const questionText = document.getElementById('questionText');
+    const answerInput = document.getElementById('answerInput');
+    const submitAnswerBtn = document.getElementById('submitAnswerBtn');
+    let localPending = null; // {cellId, askedBy}
 
-            if (!data.error) {
-                // Aktualizuje počet hráčů a seznam - jen tyto elementy bliknou
-                document.getElementById('playerCount').textContent = data.playerCount;
-                document.getElementById('playerList').textContent = data.players.join(', ');
-            }
-        } catch (error) {
-            console.error('Chyba při načítání dat:', error);
+    // Vytvoří 25 placeholder tlačítek
+    function renderEmptyGrid() {
+        gridWrapper.innerHTML = '';
+        for (let i = 0; i < 25; i++) {
+            const btn = document.createElement('button');
+            btn.className = 'cellButton';
+            btn.dataset.cellid = i;
+            btn.textContent = String.fromCharCode(65 + i); // A...
+            btn.style.padding = '12px';
+            btn.style.borderRadius = '10px';
+            btn.style.fontWeight = '700';
+            btn.style.fontSize = '1rem';
+            btn.style.cursor = 'pointer';
+            btn.style.background = '#888'; // výchozí
+            btn.onclick = onCellClick;
+            gridWrapper.appendChild(btn);
         }
-    }, 1000); // 1000 ms = 1 sekunda
+    }
+
+    function onCellClick(e) {
+        const btn = e.currentTarget;
+        const cellId = parseInt(btn.dataset.cellid, 10);
+        // žádné klikání pokud je právě čekající otázka
+        if (localPending) { alert('Na tuto otázku se čeká, dokončete ji.'); return; }
+
+        // Pošli request pro otázku
+        fetch(`/Games/RequestQuestion?gameId=${gameIdElem.textContent}&pid=${myId}&cellId=${cellId}`, { method: 'POST' })
+            .then(r => r.json())
+            .then(json => {
+                if (json.error) return alert(json.error);
+                // Server nastavil PendingQuestion v game session — polling si jej za chvili stáhne
+                // Zobrazíme otázku lokálně pokud vrácena
+                if (json.question) {
+                    showQuestion(json.question, cellId);
+                }
+            })
+            .catch(err => console.error(err));
+    }
+
+    function showQuestion(text, cellId) {
+        localPending = { cellId: cellId, askedBy: myId };
+        questionText.textContent = text;
+        answerInput.value = '';
+        questionBox.style.display = 'block';
+        answerInput.focus();
+    }
+
+    submitAnswerBtn.addEventListener('click', () => {
+        if (!localPending) return;
+        const ans = answerInput.value || '';
+        fetch(`/Games/SubmitAnswer?gameId=${gameIdElem.textContent}&pid=${myId}&cellId=${localPending.cellId}&answer=${encodeURIComponent(ans)}`, { method: 'POST' })
+            .then(r => r.json())
+            .then(json => {
+                if (json.error) { alert(json.error); return; }
+                // aktualizuj UI podle výsledku (server vrátil owner nebo -1)
+                updateGridFromState(json);
+                localPending = null;
+                questionBox.style.display = 'none';
+            })
+            .catch(err => console.error(err));
+    });
+
+    function updateGridFromState(res) {
+        // pokud vrácen cellId a owner -> přebarví tlačítko
+        if (!res.cellId && !res.grid) return;
+        // jednoduše stáhni aktuální stav ze serveru pro synchronizaci
+        fetch(`/Games/GetGameState?gameId=${gameIdElem.textContent}`)
+            .then(r => r.json())
+            .then(json => {
+                if (json.error) return;
+                applyStateToGrid(json);
+            });
+    }
+
+    function applyStateToGrid(state) {
+        const buttons = Array.from(document.getElementsByClassName('cellButton'));
+        const hasEnoughPlayers = state.canStart;
+        
+        // Aktualizace informací o hře
+        if (state.mode === "2v2" && state.teams) {
+            const blueTeam = state.players.filter(p => state.teams[p] === "blue");
+            const orangeTeam = state.players.filter(p => state.teams[p] === "orange");
+            document.getElementById('playerList').innerHTML = `
+                <div style="color:#00aaff">Modrý tým: ${blueTeam.join(", ")}</div>
+                <div style="color:#ff8c00">Oranžový tým: ${orangeTeam.join(", ")}</div>
+                <div>Potřeba hráčů: ${state.playerCount}/${state.requiredPlayers}</div>
+            `;
+        } else {
+            document.getElementById('playerList').innerHTML = `
+                Hráči: ${state.players.join(', ')} (${state.playerCount}/${state.requiredPlayers})
+            `;
+        }
+
+        // Pokud není grid inicializován, nezobrazujeme tlačítka
+        if (!state.grid || state.grid.length === 0) {
+            buttons.forEach(btn => {
+                btn.style.background = '#cccccc';
+                btn.disabled = true;
+                btn.style.cursor = 'not-allowed';
+            });
+            return;
+        }
+
+        state.grid.forEach(g => {
+            const btn = buttons[g.id];
+            if (!btn) return;
+            
+            btn.textContent = g.label;
+            btn.style.color = '#000'; // výchozí barva textu
+            
+            if (g.isAnswered && g.ownerPlayerId > 0) {
+                // Správně zodpovězené otázky
+                if (state.mode === "2v2") {
+                    btn.style.background = g.team === "blue" ? '#00aaff' : '#ff8c00';
+                } else {
+                    if (g.ownerPlayerId == parseInt(myId)) {
+                        btn.style.background = '#00aaff';
+                    } else {
+                        btn.style.background = '#ff8c00';
+                    }
+                }
+                btn.disabled = true;
+                btn.style.cursor = 'not-allowed';
+            } else if (g.ownerPlayerId === -1) {
+                // Špatně zodpovězená - černá, lze kliknout znovu
+                btn.style.background = '#333';
+                btn.style.color = '#fff';
+                btn.disabled = false;
+                btn.style.cursor = 'pointer';
+            } else {
+                // Nezodpovězená otázka
+                if (!hasEnoughPlayers) {
+                    btn.style.background = '#aaaaaa'; // světle šedá - čeká na hráče
+                    btn.disabled = true;
+                    btn.style.cursor = 'not-allowed';
+                } else {
+                    btn.style.background = '#666666'; // tmavší šedá - hra běží
+                    btn.disabled = false;
+                    btn.style.cursor = 'pointer';
+                }
+            }
+
+            // Finální kontrola - povolení kliknutí jen pro aktivního hráče
+            if (hasEnoughPlayers && state.currentTurn !== myId) {
+                btn.disabled = true;
+                btn.style.cursor = 'not-allowed';
+                btn.style.opacity = '0.7';
+            } else if (hasEnoughPlayers && state.currentTurn === myId) {
+                // Pokud je můj tah a tlačítko není zodpovězené správně, povol klikání
+                if (!g.isAnswered || g.ownerPlayerId === -1) {
+                    btn.disabled = false;
+                    btn.style.cursor = 'pointer';
+                    btn.style.opacity = '1';
+                }
+            } else if (state.mode === "Procvičení") {
+                // V procvičení je vždy povoleno klikat
+                if (!g.isAnswered || g.ownerPlayerId === -1) {
+                    btn.disabled = false;
+                    btn.style.cursor = 'pointer';
+                    btn.style.opacity = '1';
+                }
+            }
+        });
+    }
+
+    // Polling stavu každou sekundu
+    setInterval(() => {
+        fetch(`/Games/GetGameState?gameId=${gameIdElem.textContent}`)
+            .then(r => r.json())
+            .then(json => {
+                if (json.error) { console.error(json.error); return; }
+                applyStateToGrid(json);
+            })
+            .catch(e => console.error(e));
+    }, 1000);
+
+    // inicializace
+    renderEmptyGrid();
+    // okamžitě stáhni stav
+    fetch(`/Games/GetGameState?gameId=${gameIdElem.textContent}`)
+        .then(r => r.json())
+        .then(json => {
+            if (!json.error) {
+                applyStateToGrid(json);
+            }
+        });
 </script>
 
 <style>
-    code {
-        background: #e9ecef;
-        padding: 0.2rem 0.5rem;
-        border-radius: 4px;
-    }
+    .cellButton { width:100%; height:72px; min-height:56px; }
+    .button { padding:.6rem 1rem; border-radius:8px; background:linear-gradient(180deg,#00f2ff,#0088ff); color:#fff; border:none; }
 </style>
