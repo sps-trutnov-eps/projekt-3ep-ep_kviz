@@ -43,8 +43,8 @@
             text-align: center;
             width: 100%;
             max-width: 400px;
-            background: transparent;     /* removed colored background */
-            box-shadow: none;            /* removed frame / glow */
+            background: transparent; /* removed colored background */
+            box-shadow: none; /* removed frame / glow */
         }
 
         h1 {
@@ -80,10 +80,10 @@
             transition: transform .15s, box-shadow .15s;
         }
 
-        button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 18px rgba(0,242,255,0.8);
-        }
+            button:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 18px rgba(0,242,255,0.8);
+            }
 
         /* Make the back button match Register: positioned top-right */
         .home-button {
@@ -102,25 +102,29 @@
             z-index: 10;
         }
 
-        .home-button:hover {
-            transform: scale(1.07);
-            box-shadow: 0 0 18px rgba(0,242,255,0.8);
-        }
+            .home-button:hover {
+                transform: scale(1.07);
+                box-shadow: 0 0 18px rgba(0,242,255,0.8);
+            }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Přihlášení</h1>
 
-        <div class="errorText">
-            @ViewBag.Message
-        </div>
+
+        @if (ViewBag.Message != null)
+        {
+            <div class="errorText">
+                @ViewBag.Message
+            </div>
+        }
 
 
         <form asp-action="Login" method="post">
             <div class="form-group">
                 <label asp-for="Username">Uživatelské jméno</label>
-                <input asp-for="Username" class="form-control"/>
+                <input asp-for="Username" class="form-control" />
 
             </div>
             <div class="form-group">
@@ -131,7 +135,7 @@
             <button type="submit" class="btn btn-primary">Přihlásit se</button>
 
         </form>
-
+        <a href="/Uzivatele/Register" class="register-button">Registrace</a>
 
 
     </div>

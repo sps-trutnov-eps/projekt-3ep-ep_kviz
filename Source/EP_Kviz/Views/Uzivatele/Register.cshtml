@@ -30,17 +30,61 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            flex-direction: column;
+            flex-direction: column; /* match Register layout */
             font-family: "Orbitron", sans-serif;
             background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
             color: #fff;
         }
 
+        /* Keep container layout but remove the visual "frame" */
+        .container {
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            background: transparent; /* removed colored background */
+            box-shadow: none; /* removed frame / glow */
+        }
+
         h1 {
-            font-size: 3rem;
-            margin-bottom: 2rem;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
             text-shadow: 0 0 12px rgba(0,255,255,0.6);
         }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        input {
+            padding: 0.7rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        button {
+            padding: 0.7rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 700;
+            background: linear-gradient(180deg,#00f2ff,#0088ff);
+            color: #fff;
+            cursor: pointer;
+            transition: transform .15s, box-shadow .15s;
+        }
+
+            button:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 18px rgba(0,242,255,0.8);
+            }
+
 
         .home-button {
             position: absolute;
@@ -58,117 +102,88 @@
             z-index: 10;
         }
 
-            .home-button:hover {
-                transform: scale(1.07);
-                box-shadow: 0 0 18px rgba(0,242,255,0.8);
-            }
-
-        /* Přidání společných stylů pro formulář */
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            width: 300px;
+        .home-button:hover {
+            transform: scale(1.07);
+            box-shadow: 0 0 18px rgba(0,242,255,0.8);
+            
         }
 
-        input {
-            padding: 0.7rem;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-        }
-
-        button {
-            padding: 0.7rem;
-            border: none;
-            border-radius: 4px;
-            font-size: 1rem;
-            font-weight: 700;
-            color: #fff;
-            background: linear-gradient(180deg,#00f2ff,#0088ff);
-            cursor: pointer;
-            transition: background .15s;
-        }
-
-            button:hover {
-                background: linear-gradient(180deg,#0088ff,#00f2ff);
-            }
-
-            .errorText{
-                background-color:   lightcoral;
-                color: black;
-                padding: 0.5rem;
-            }
-
-
-        v .home-button {
-            position: absolute;
-            top: 24px;
-            right: 32px;
-            padding: 0.7rem 1.4rem;
+        .errorText{
+            background-color: orangered;
+            color: white;
+            padding: 1rem 1rem 1rem 1rem;
             border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 700;
-            background: linear-gradient(180deg,#00f2ff,#0088ff);
-            color: #fff;
-            text-decoration: none;
-            box-shadow: 0 0 10px rgba(0,136,255,0.5);
-            transition: transform .15s, box-shadow .15s;
-            z-index: 10;
+            font-weight: bolder;     
+            font-size: 1.2rem;
         }
 
+        .text-danger{
+            display: block;
+            margin-top: 0.2rem;
+            padding: 0.2rem 0.2rem 0.2rem 0.2rem;
+            background-color: white;
+            color: orangered;
+            border-radius: 8px;
+            font-weight: bolder;
+        }
 
-
+       .text-danger:empty {
+              display: none;
+        }
 
 
     </style>
 </head>
 <body>
-    <h2>Registrace nového uživatele</h2>
+    <div class="container">
+        <h1>Registrace uživatele</h1>
 
 
-    @if (ViewBag.Message != null)
-    {
-
-        @* START FORMÁTOVÁNÍ *@
 
 
-        <div class="errorText">
-            @ViewBag.Message
-        </div>
-    }
+
+        <form asp-action="Register" method="post">
+
+            @if (ViewBag.Message != null)
+            {
+                <div class="errorText">
+                    @ViewBag.Message
+                </div>
+            }
+    
+
+            <div class="form-group">
+                <label asp-for="Username">Uživatelské jméno</label>
+                <input asp-for="Username" class="form-control" />
+                <span asp-validation-for="Username" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Email">Email</label>
+                <input asp-for="Email" class="form-control" type="email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Password">Heslo</label>
+                <input asp-for="Password" class="form-control" type="password" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+
+            </div>
+            <button type="submit" class="btn btn-primary">Registrovat</button>
 
 
-    <form asp-action="Register" method="post">
-        <div asp-validation-summary="All" class="text-danger"></div>
-        <div class="form-group">
-            <label asp-for="Username">Uživatelské jméno</label>
-            <input asp-for="Username" class="form-control" />
-           
-        </div>
+        </form>
 
-        <div class="form-group">
-            <label asp-for="Email">Email</label>
-            <input asp-for="Email" class="form-control" type="email" />
-         
-        </div>
-
-        <div class="radekVyplneni">
-            <label asp-for="Password">Heslo</label>
-            <input asp-for="Password" class="form-control" type="password" />
-  
-        </div>
-        <button type="submit" class="btn btn-primary">Registrovat</button>
-
-        <small class="pravidlaHesla">
+        <div class="pravidlaHesla">
             Heslo musí obsahovat: velké písmeno, malé písmeno, číslo, speciální znak a minimálně 6 znaků
-        </small>
+        </div>
 
-        
-    </form>
+
+    </div>
     <a href="/Home/Index" class="home-button">Zpět na hlavní stránku</a>
 
-        @* KONEC FORMÁTVÁNÍ *@
 
     @section Scripts {
         @{

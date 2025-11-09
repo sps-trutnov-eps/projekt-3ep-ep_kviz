@@ -17,7 +17,14 @@ namespace EP_Kviz.Controllers
         public IActionResult Index()
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            ViewBag.Message = userId;
+            if (userId == null)
+            {
+
+                ViewBag.Message = "Uživatel není pøihlášen";
+            }
+            else {
+                ViewBag.Message = "Uživatel je pøihlášený";
+            }
             return View();
         }
 

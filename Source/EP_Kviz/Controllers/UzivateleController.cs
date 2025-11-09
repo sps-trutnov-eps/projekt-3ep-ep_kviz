@@ -55,7 +55,7 @@ namespace EP_Kviz.Controllers
 
             if (!result.Succeeded)
             {
-                ViewBag.Message = "Registrace se nezdařila: " + string.Join(", ", result.Errors.Select(e => e.Description));
+                ViewBag.Message = "Registrace se nezdařila";
                 return View();
             }
 
