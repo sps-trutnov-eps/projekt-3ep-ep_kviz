@@ -7,6 +7,8 @@ using System.IO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 public class GamesController : Controller
 {
@@ -19,15 +21,21 @@ public class GamesController : Controller
         _cache = cache;
     }
 
+    [Authorize]
     public IActionResult Vyber()
     {
-        int? userId = HttpContext.Session.GetInt32("UserId");
-        if (userId == null)
+        // Získání přihlášeného uživatele z Identity
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        
+        if (string.IsNullOrEmpty(userId))
         {
-            return RedirectToAction("Login", "Home");
+            return RedirectToAction("Login", "Uzivatele");
         }
 
-        ViewBag.UserId = userId.Value;
+        // Pro hru použijeme hashCode userId jako číslo
+        int numericUserId = Math.Abs(userId.GetHashCode());
+        ViewBag.UserId = numericUserId;
+        
         return View();
     }
 
@@ -100,6 +108,7 @@ public class GamesController : Controller
             }
 
             if (!game.Players.Contains(pid))
+            {
                 game.Players.Add(pid);
                 
                 // Přiřazení týmu pro 2v2
@@ -114,8 +123,6 @@ public class GamesController : Controller
                 {
                     EnsureGridInitialized(game);
                 }
-
-                _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
             }
 
             if (game.Scores == null)
@@ -243,7 +250,7 @@ public class GamesController : Controller
                 pending = game.PendingQuestion != null ? new { 
                     game.PendingQuestion.CellId, 
                     game.PendingQuestion.AskedByPlayerId 
-                } : null
+                } : null,
                 scores = game.Scores ?? new Dictionary<int, int>()
             });
         }

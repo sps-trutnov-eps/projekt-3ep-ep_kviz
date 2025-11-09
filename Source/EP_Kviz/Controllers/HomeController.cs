@@ -20,10 +20,10 @@ namespace EP_Kviz.Controllers
             if (userId == null)
             {
 
-                ViewBag.Message = "U�ivatel nen� p�ihl�en";
+                ViewBag.Message = "Uživatel není přihlášen";
             }
             else {
-                ViewBag.Message = "U�ivatel je p�ihl�en�";
+                ViewBag.Message = "Uživatel je přihlášen";
             }
             return View();
         }
@@ -48,63 +48,5 @@ namespace EP_Kviz.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-
-        
-
-
-        [HttpPost]
-        public IActionResult Register(RegisterViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                if (users.Any(u => u.Username == model.Username))
-                {
-                    ViewBag.Message = "U�ivatel ji� existuje.";
-                    return View();
-                }
-
-                var user = new User
-                {
-                    Id = nextId++,
-                    Username = model.Username,
-                    Password = model.Password
-                };
-                users.Add(user);
-
-                ViewBag.RegistrationSuccess = true;
-                ModelState.Clear(); // Vy�ist� formul��
-                return View();
-            }
-            
-            ViewBag.RegistrationSuccess = false;
-            return View(model);
-        }
-
-        [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Login(LoginViewModel model)
-        {
-            var user = users.FirstOrDefault(u => u.Username == model.Username && u.Password == model.Password);
-            if (user != null)
-            {
-                // Ulo�en� ID do session
-                HttpContext.Session.SetInt32("UserId", user.Id);
-
-                // P�esm�rov�n� na v�b�r hry
-                return RedirectToAction("Index");
-            }
-            else
-            {
-                ViewBag.Message = "�patn� jm�no nebo heslo.";
-                return View();
-            }
-        }
-
-
     }
 }

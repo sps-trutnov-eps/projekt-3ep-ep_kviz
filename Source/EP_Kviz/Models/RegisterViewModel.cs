@@ -4,17 +4,22 @@ namespace EP_Kviz.Models
 {
     public class RegisterViewModel
     {
-        [Required(ErrorMessage = "U�ivatelsk� jm�no je povinn�")]
+        [Required(ErrorMessage = "Uživatelské jméno je povinné")]
         public string Username { get; set; }
 
-        [Required(ErrorMessage = "Email je povinn�")]
-        [EmailAddress(ErrorMessage = "Neplatn� email")]
+        [Required(ErrorMessage = "Email je povinný")]
+        [EmailAddress(ErrorMessage = "Neplatný email")]
         public string Email { get; set; }
 
-        [Required(ErrorMessage = "Heslo je povinn�")]
+        [Required(ErrorMessage = "Heslo je povinné")]
         [DataType(DataType.Password)]
-        [MinLength(6, ErrorMessage = "Heslo mus� m�t alespo� 6 znak�")]
-        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$", ErrorMessage = "Heslo mus� obsahovat velk� p�smeno, mal� p�smeno, ��slo a speci�ln� znak.")]
+        [MinLength(6, ErrorMessage = "Heslo musí mít alespoň 6 znaků")]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$", ErrorMessage = "Heslo musí obsahovat velké písmeno, malé písmeno, číslo a speciální znak.")]
         public string Password { get; set; }
+
+        [Required(ErrorMessage = "Potvrzení hesla je povinné")]
+        [DataType(DataType.Password)]
+        [Compare("Password", ErrorMessage = "Hesla se neshodují")]
+        public string ConfirmPassword { get; set; }
     }
 }
