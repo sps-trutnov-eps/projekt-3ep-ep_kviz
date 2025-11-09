@@ -109,69 +109,94 @@
     }
 
     function applyStateToGrid(state) {
-        document.getElementById('playerList').textContent = state.players.join(', ');
         const buttons = Array.from(document.getElementsByClassName('cellButton'));
-        const hasEnoughPlayers = state.players.length >= 2;
+        const hasEnoughPlayers = state.canStart;
+        
+        // Aktualizace informací o hře
+        if (state.mode === "2v2" && state.teams) {
+            const blueTeam = state.players.filter(p => state.teams[p] === "blue");
+            const orangeTeam = state.players.filter(p => state.teams[p] === "orange");
+            document.getElementById('playerList').innerHTML = `
+                <div style="color:#00aaff">Modrý tým: ${blueTeam.join(", ")}</div>
+                <div style="color:#ff8c00">Oranžový tým: ${orangeTeam.join(", ")}</div>
+                <div>Potřeba hráčů: ${state.playerCount}/${state.requiredPlayers}</div>
+            `;
+        } else {
+            document.getElementById('playerList').innerHTML = `
+                Hráči: ${state.players.join(', ')} (${state.playerCount}/${state.requiredPlayers})
+            `;
+        }
+
+        // Pokud není grid inicializován, nezobrazujeme tlačítka
+        if (!state.grid || state.grid.length === 0) {
+            buttons.forEach(btn => {
+                btn.style.background = '#cccccc';
+                btn.disabled = true;
+                btn.style.cursor = 'not-allowed';
+            });
+            return;
+        }
 
         state.grid.forEach(g => {
             const btn = buttons[g.id];
             if (!btn) return;
             
             btn.textContent = g.label;
+            btn.style.color = '#000'; // výchozí barva textu
             
-            if (g.isAnswered) {
+            if (g.isAnswered && g.ownerPlayerId > 0) {
                 // Správně zodpovězené otázky
-                if (g.ownerPlayerId > 0) {
-                    if (g.ownerPlayerId == parseInt(myId)) {
-                        btn.style.background = '#00aaff'; // tvoje barva
-                    } else {
-                        btn.style.background = '#ff8c00'; // protivník
-                    }
-                    btn.disabled = true; // na správně zodpovězené nelze klikat
-                }
-            } else {
-                // Nezodpovězené nebo špatně zodpovězené otázky
-                if (g.ownerPlayerId === -1) {
-                    // Špatně zodpovězená - černá, ale lze na ni kliknout
-                    btn.style.background = '#333';
-                    btn.style.color = '#fff';
-                    btn.disabled = false;
+                if (state.mode === "2v2") {
+                    btn.style.background = g.team === "blue" ? '#00aaff' : '#ff8c00';
                 } else {
-                    // Nezodpovězená otázka
-                    if (!hasEnoughPlayers) {
-                        // Světle šedá když není dost hráčů
-                        btn.style.background = '#aaaaaa';
+                    if (g.ownerPlayerId == parseInt(myId)) {
+                        btn.style.background = '#00aaff';
                     } else {
-                        // Tmavší šedá když hra běží
-                        btn.style.background = '#666666';
+                        btn.style.background = '#ff8c00';
                     }
-                    btn.disabled = false;
                 }
-            }
-
-            // Pokud není můj tah, všechna tlačítka jsou disabled
-            if (state.currentTurn !== myId) {
                 btn.disabled = true;
                 btn.style.cursor = 'not-allowed';
+            } else if (g.ownerPlayerId === -1) {
+                // Špatně zodpovězená - černá, lze kliknout znovu
+                btn.style.background = '#333';
+                btn.style.color = '#fff';
+                btn.disabled = false;
+                btn.style.cursor = 'pointer';
             } else {
-                // Pokud je můj tah, povol klikání na nezodpovězené a špatně zodpovězené
-                if (!g.isAnswered || g.ownerPlayerId === -1) {
+                // Nezodpovězená otázka
+                if (!hasEnoughPlayers) {
+                    btn.style.background = '#aaaaaa'; // světle šedá - čeká na hráče
+                    btn.disabled = true;
+                    btn.style.cursor = 'not-allowed';
+                } else {
+                    btn.style.background = '#666666'; // tmavší šedá - hra běží
                     btn.disabled = false;
                     btn.style.cursor = 'pointer';
                 }
             }
-        });
 
-        // jestli je aktivní pending otázka - zobraz ji všem (ale odpovědět může jen askedBy)
-        if (state.pending) {
-            fetch(`/Games/GetGameState?gameId=${gameIdElem.textContent}`)
-                .then(r => r.json())
-                .then(full => {
-                    // pokud server má pending, ukážeme ji (text server nevrací v GetGameState z bezpečnostních důvodů),
-                    // proto použijeme další routu RequestQuestion kontroly - ale pro jednoduchost necháme klienty dotazovat detail (neimplementováno).
-                    // Z tohoto jednoduchého flow spoléháme, že otázka byla poskytnuta při requestu a lokální pending je nastavený u tazatele.
-                });
-        }
+            // Finální kontrola - povolení kliknutí jen pro aktivního hráče
+            if (hasEnoughPlayers && state.currentTurn !== myId) {
+                btn.disabled = true;
+                btn.style.cursor = 'not-allowed';
+                btn.style.opacity = '0.7';
+            } else if (hasEnoughPlayers && state.currentTurn === myId) {
+                // Pokud je můj tah a tlačítko není zodpovězené správně, povol klikání
+                if (!g.isAnswered || g.ownerPlayerId === -1) {
+                    btn.disabled = false;
+                    btn.style.cursor = 'pointer';
+                    btn.style.opacity = '1';
+                }
+            } else if (state.mode === "Procvičení") {
+                // V procvičení je vždy povoleno klikat
+                if (!g.isAnswered || g.ownerPlayerId === -1) {
+                    btn.disabled = false;
+                    btn.style.cursor = 'pointer';
+                    btn.style.opacity = '1';
+                }
+            }
+        });
     }
 
     // Polling stavu každou sekundu

@@ -3,7 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using EP_Kviz.Models;
 using System.Text;
 using System.Text.Json;
-using System.IO;  // <- Přidej tento řádek
+using System.IO;
 
 public class GamesController : Controller
 {
@@ -21,14 +21,12 @@ public class GamesController : Controller
         int? userId = HttpContext.Session.GetInt32("UserId");
         if (userId == null)
         {
-            // Nepřihlášený uživatel, přesměrování na login
             return RedirectToAction("Login", "Home");
         }
 
         ViewBag.UserId = userId.Value;
         return View();
     }
-
 
     public IActionResult OneVOne(int pid)
     {
@@ -43,7 +41,6 @@ public class GamesController : Controller
         };
 
         _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
-
         return RedirectToAction("Play", new { gameId = gameId, pid = pid });
     }
 
@@ -59,8 +56,10 @@ public class GamesController : Controller
             CreatedAt = DateTime.Now
         };
 
-        _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
+        // Pro 2v2 inicializujeme první hráč do modrého týmu
+        game.PlayerTeams[pid] = "blue";
 
+        _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
         return RedirectToAction("Play", new { gameId = gameId, pid = pid });
     }
 
@@ -76,8 +75,10 @@ public class GamesController : Controller
             CreatedAt = DateTime.Now
         };
 
+        // Pro procvičení ihned inicializujeme grid a hráč může začít
+        EnsureGridInitialized(game);
+        
         _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
-
         return RedirectToAction("Play", new { gameId = gameId, pid = pid });
     }
 
@@ -85,9 +86,30 @@ public class GamesController : Controller
     {
         if (_cache.TryGetValue($"game_{gameId}", out GameSession game))
         {
+            // Kontrola maximálního počtu hráčů
+            if (game.Players.Count >= game.RequiredPlayers)
+            {
+                TempData["Error"] = "Hra je již plná!";
+                return RedirectToAction("Vyber");
+            }
+
             if (!game.Players.Contains(pid))
             {
                 game.Players.Add(pid);
+                
+                // Přiřazení týmu pro 2v2
+                if (game.Mode == "2v2")
+                {
+                    string team = game.Players.Count <= 2 ? "blue" : "orange";
+                    game.PlayerTeams[pid] = team;
+                }
+
+                // Pokud je teď dost hráčů, inicializuj grid
+                if (game.CanStart && (game.Grid == null || game.Grid.Count == 0))
+                {
+                    EnsureGridInitialized(game);
+                }
+
                 _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
             }
 
@@ -100,10 +122,10 @@ public class GamesController : Controller
         }
     }
 
-    // Po vytvoření/joinu při 1v1: inicializujeme grid když dosáhneme 2 hráčů
     private void EnsureGridInitialized(GameSession game)
     {
-        if (game.Grid != null && game.Grid.Count == 25) return;
+        if (game.Grid?.Count == 25) return;
+        if (!game.CanStart) return;
 
         game.Grid = new List<Cell>();
         char label = 'A';
@@ -112,8 +134,21 @@ public class GamesController : Controller
             game.Grid.Add(new Cell { Id = i, Label = ((char)(label + i)).ToString() });
         }
 
-        // první hráč začne
-        game.CurrentTurnPlayerId = game.Players.Count > 0 ? game.Players[0] : (int?)null;
+        // Nastavení prvního tahu podle módu
+        if (game.Mode == "Procvičení")
+        {
+            game.CurrentTurnPlayerId = game.Players[0];
+        }
+        else if (game.Mode == "2v2")
+        {
+            // První modrý hráč začíná
+            game.CurrentTurnPlayerId = game.Players.First(p => game.GetPlayerTeam(p) == "blue");
+        }
+        else // 1v1
+        {
+            game.CurrentTurnPlayerId = game.Players[0];
+        }
+
         game.PendingQuestion = null;
     }
 
@@ -125,7 +160,6 @@ public class GamesController : Controller
         {
             if (_questionsCache != null) return _questionsCache;
 
-            // Hledáme soubor Otázky.txt relativně k výstupnímu adresáři
             string baseDir = AppContext.BaseDirectory;
             string[] candidates =
             {
@@ -134,7 +168,7 @@ public class GamesController : Controller
                 Path.Combine(Directory.GetParent(Directory.GetParent(baseDir)?.FullName ?? "")?.FullName ?? "", "Otázky.txt")
             };
 
-            string path = candidates.FirstOrDefault(p => System.IO.File.Exists(p));  // <- Zde je změna
+            string path = candidates.FirstOrDefault(p => System.IO.File.Exists(p));
             var list = new List<(string Q, string A)>();
             if (path != null)
             {
@@ -151,18 +185,10 @@ public class GamesController : Controller
         }
     }
 
-    // Úprava Play: pokud hra existuje a má dost hráčů, inicializovat grid
     public IActionResult Play(int gameId, int pid)
     {
         if (_cache.TryGetValue($"game_{gameId}", out GameSession game))
         {
-            // pokud je počet hráčů dosažen -> inicializuj grid
-            if (game.Players.Count >= 2 && (game.Grid == null || game.Grid.Count == 0))
-            {
-                EnsureGridInitialized(game);
-                _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
-            }
-
             ViewBag.GameId = game.GameId;
             ViewBag.Mode = game.Mode;
             ViewBag.PlayerId = pid;
@@ -178,7 +204,6 @@ public class GamesController : Controller
         }
     }
 
-    // Vrátí kompletní stav (grid/currentTurn/pendingQuestion) pro klienty (polling)
     [HttpGet]
     public IActionResult GetGameState(int gameId)
     {
@@ -190,27 +215,45 @@ public class GamesController : Controller
                 mode = game.Mode,
                 players = game.Players,
                 playerCount = game.Players.Count,
+                requiredPlayers = game.RequiredPlayers,
+                canStart = game.CanStart,
                 currentTurn = game.CurrentTurnPlayerId,
-                grid = game.Grid.Select(c => new { c.Id, c.Label, c.OwnerPlayerId, c.IsAnswered }),
-                pending = game.PendingQuestion != null ? new { game.PendingQuestion.CellId, game.PendingQuestion.AskedByPlayerId } : null
+                grid = game.Grid?.Select(c => new { 
+                    c.Id, 
+                    c.Label, 
+                    c.OwnerPlayerId, 
+                    c.IsAnswered,
+                    team = game.Mode == "2v2" && c.OwnerPlayerId.HasValue ? 
+                          game.GetPlayerTeam(c.OwnerPlayerId.Value) : null
+                }).Cast<object>().ToList() ?? new List<object>(),
+                teams = game.Mode == "2v2" ? game.PlayerTeams : null,
+                pending = game.PendingQuestion != null ? new { 
+                    game.PendingQuestion.CellId, 
+                    game.PendingQuestion.AskedByPlayerId 
+                } : null
             });
         }
         return Json(new { error = "Game not found" });
     }
 
-    // Požadavek na otázku - pouze ten, kdo má tah
     [HttpPost]
     public IActionResult RequestQuestion(int gameId, int pid, int cellId)
     {
         if (!_cache.TryGetValue($"game_{gameId}", out GameSession game))
             return Json(new { error = "Game not found" });
 
-        if (game.CurrentTurnPlayerId != pid)
+        if (!game.CanStart)
+            return Json(new { error = "Čekám na další hráče..." });
+
+        if (!game.IsPlayersTurn(pid))
             return Json(new { error = "Není tvůj tah." });
 
-        var cell = game.Grid.FirstOrDefault(c => c.Id == cellId);
-        if (cell == null) return Json(new { error = "Neplatná buňka." });
-        if (cell.IsAnswered) return Json(new { error = "Buňka už byla zodpovězena." });
+        var cell = game.Grid?.FirstOrDefault(c => c.Id == cellId);
+        if (cell == null) 
+            return Json(new { error = "Neplatná buňka." });
+
+        if (cell.IsAnswered) 
+            return Json(new { error = "Buňka už byla zodpovězena." });
 
         var questions = LoadQuestions();
         if (questions == null || questions.Count == 0)
@@ -228,23 +271,32 @@ public class GamesController : Controller
         };
 
         _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
-
-        // Vrátíme text otázky klientovi (oba klienti ho uvidí skrz polling)
         return Json(new { ok = true, question = q.Q, cellId = cellId });
     }
 
-    // Odeslání odpovědi
     [HttpPost]
     public IActionResult SubmitAnswer(int gameId, int pid, int cellId, string answer)
     {
         if (!_cache.TryGetValue($"game_{gameId}", out GameSession game))
             return Json(new { error = "Game not found" });
 
-        if (game.PendingQuestion == null) return Json(new { error = "Není žádná aktivní otázka." });
-        if (game.PendingQuestion.CellId != cellId) return Json(new { error = "Otázka neodpovídá této buňce." });
-        if (game.PendingQuestion.AskedByPlayerId != pid) return Json(new { error = "Nemůžeš odpovědět na otázku, kterou nepožádal tvůj tah." });
+        if (!game.CanStart)
+            return Json(new { error = "Čekám na další hráče..." });
 
-        var correct = string.Equals((game.PendingQuestion.Answer ?? "").Trim(), (answer ?? "").Trim(), StringComparison.OrdinalIgnoreCase);
+        if (game.PendingQuestion == null)
+            return Json(new { error = "Není žádná aktivní otázka." });
+
+        if (game.PendingQuestion.CellId != cellId)
+            return Json(new { error = "Otázka neodpovídá této buňce." });
+
+        if (game.PendingQuestion.AskedByPlayerId != pid)
+            return Json(new { error = "Nemůžeš odpovědět na otázku, kterou nepožádal tvůj tah." });
+
+        var correct = string.Equals(
+            (game.PendingQuestion.Answer ?? "").Trim(),
+            (answer ?? "").Trim(),
+            StringComparison.OrdinalIgnoreCase
+        );
 
         var cell = game.Grid.First(c => c.Id == cellId);
         if (correct)
@@ -254,22 +306,24 @@ public class GamesController : Controller
         }
         else
         {
-            // Špatná odpověď - buňka zůstane aktivní (IsAnswered = false)
-            // a označíme ji černě (OwnerPlayerId = -1)
-            cell.OwnerPlayerId = -1;
-            cell.IsAnswered = false; // Změna zde - může se znovu odpovídat
+            cell.OwnerPlayerId = -1; // černá
+            cell.IsAnswered = false;  // lze znovu odpovídat
         }
 
-        // Clear pending question
         game.PendingQuestion = null;
-
-        // Posun tahu na dalšího hráče (pokud existuje)
-        var other = game.Players.FirstOrDefault(p => p != pid);
-        game.CurrentTurnPlayerId = other;
-
+        game.CurrentTurnPlayerId = game.GetNextPlayer(pid);
+        
         _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
 
-        return Json(new { ok = true, correct = correct, owner = cell.OwnerPlayerId, cellId = cellId, nextTurn = game.CurrentTurnPlayerId });
+        return Json(new
+        {
+            ok = true,
+            correct = correct,
+            owner = cell.OwnerPlayerId,
+            cellId = cellId,
+            nextTurn = game.CurrentTurnPlayerId,
+            team = game.Mode == "2v2" ? game.GetPlayerTeam(cell.OwnerPlayerId ?? -1) : null
+        });
     }
 
     private int GenerateRandomGameId()
