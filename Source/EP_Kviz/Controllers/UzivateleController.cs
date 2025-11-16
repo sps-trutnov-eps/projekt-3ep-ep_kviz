@@ -26,9 +26,25 @@ namespace EP_Kviz.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (model == null || string.IsNullOrEmpty(model.Username) || string.IsNullOrEmpty(model.Password) || string.IsNullOrEmpty(model.Email))
+            if (model == null)
             {
-                ViewBag.Message = "Neplatné údaje.";
+                ViewBag.Message = "Něco se nepovedlo.";
+                return View();
+            }
+            if (string.IsNullOrEmpty(model.Username) && (string.IsNullOrEmpty(model.Password)))
+            {
+                ViewBag.Message = "Vyplňte všechny pole.";
+                return View();
+            }
+
+            if (string.IsNullOrEmpty(model.Username))
+            {
+                ViewBag.Message = "Zadejte uživatelské jméno";
+                return View();
+            }
+            if (string.IsNullOrEmpty(model.Password))
+                {
+                ViewBag.Message = "Zadejte heslo.";
                 return View();
             }
 
