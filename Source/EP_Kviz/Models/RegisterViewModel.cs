@@ -13,9 +13,9 @@ namespace EP_Kviz.Models
         [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$", ErrorMessage = "Heslo musí obsahovat velké písmeno, malé písmeno, číslo a speciální znak.")]
         public string Password { get; set; }
 
-        [Required(ErrorMessage = "Potvrzení hesla je povinné")]
-        [DataType(DataType.Password)]
         [Compare("Password", ErrorMessage = "Hesla se neshodují")]
+        [DataType(DataType.Password)]
+        [Required(ErrorMessage = "Potvrzení hesla je povinné")]
         public string ConfirmPassword { get; set; }
     }
 }
