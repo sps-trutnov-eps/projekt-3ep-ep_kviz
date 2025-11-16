@@ -87,21 +87,21 @@ namespace EP_Kviz.Controllers
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
-            if (string.IsNullOrEmpty(model.Username) && string.IsNullOrEmpty(model.Password))
+            if (string.IsNullOrEmpty(model.Password) && (string.IsNullOrEmpty(model.Username)))
             {
                 ViewBag.Message = "Zadejte přihlašovací údaje.";
-                return View();
-            }
-            if (string.IsNullOrEmpty(model.Password))
-            {
-                ViewBag.Message = "Neplatné údaje. " +
-                    "Zadejte heslo";
                 return View();
             }
             if (string.IsNullOrEmpty(model.Username))
             {
                 ViewBag.Message = "Neplatné údaje. " +
                     "Zadejte uživatelské jméno";
+                return View();
+            }
+            if (string.IsNullOrEmpty(model.Password))
+            {
+                ViewBag.Message = "Neplatné údaje. " +
+                    "Zadejte heslo";
                 return View();
             }
 
