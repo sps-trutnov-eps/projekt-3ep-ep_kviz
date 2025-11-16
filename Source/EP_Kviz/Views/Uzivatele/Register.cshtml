@@ -174,6 +174,12 @@
                 <span asp-validation-for="Password" class="text-danger"></span>
 
             </div>
+            <div class="form-group">
+                <label asp-for="ConfirmPassword">Potvrzení Hesla</label>
+                <input asp-for="ConfirmPassword" class="form-control" type="password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+
+            </div>
             <button type="submit" class="btn btn-primary">Registrovat</button>
 
 

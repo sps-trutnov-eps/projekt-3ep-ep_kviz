@@ -7,10 +7,6 @@ namespace EP_Kviz.Models
         [Required(ErrorMessage = "Uživatelské jméno je povinné")]
         public string Username { get; set; }
 
-        [Required(ErrorMessage = "Email je povinný")]
-        [EmailAddress(ErrorMessage = "Neplatný email")]
-        public string Email { get; set; }
-
         [Required(ErrorMessage = "Heslo je povinné")]
         [DataType(DataType.Password)]
         [MinLength(6, ErrorMessage = "Heslo musí mít alespoň 6 znaků")]

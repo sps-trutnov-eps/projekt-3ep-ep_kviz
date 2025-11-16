@@ -64,7 +64,6 @@ namespace EP_Kviz.Controllers
             var newuser = new UzivateleModel
             {
                 UserName = model.Username,
-                Email = model.Email
             };
 
             var result = await _userManager.CreateAsync(newuser, model.Password);
