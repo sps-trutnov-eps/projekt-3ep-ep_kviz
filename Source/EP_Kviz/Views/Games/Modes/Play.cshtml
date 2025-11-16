@@ -230,7 +230,7 @@
     function updateGridFromState(res) {
         if (!res.cellId && !res.grid) return;
         fetch(`/Games/GetGameState?gameId=${gameIdElem.textContent}`)
-            .then r => r.json())
+            .then(r => r.json())
             .then(json => {
                 if (json.error) return;
                 applyStateToGrid(json);
@@ -240,17 +240,6 @@
     function applyStateToGrid(state) {
         const buttons = Array.from(document.getElementsByClassName('cellButton'));
         const hasEnoughPlayers = state.canStart;
-        
-        // Kontrola výhry
-        if (state.isGameOver) {
-            showWinner(state);
-            // Zablokovat všechna tlačítka
-            buttons.forEach(btn => {
-                btn.disabled = true;
-                btn.style.cursor = 'not-allowed';
-            });
-            return;
-        }
         
         // Aktualizace informací o hře
         if (state.mode === "2v2" && state.teams) {
@@ -279,6 +268,7 @@
             return;
         }
 
+        // NEJDŘÍV aktualizujeme všechna tlačítka
         state.grid.forEach(g => {
             const btn = buttons[g.id];
             if (!btn) return;
@@ -337,26 +327,40 @@
                 }
             }
         });
+
+        // AŽ POTOM kontrolujeme výhru (grid je už aktualizovaný)
+        if (state.isGameOver) {
+            showWinner(state);
+            // Zablokovat všechna tlačítka
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.style.cursor = 'not-allowed';
+            });
+            return;
+        }
     }
 
     function showWinner(state) {
         const winnerBox = document.getElementById('winnerBox');
         const winnerText = document.getElementById('winnerText');
         
-        if (state.mode === "2v2" && state.winnerTeam) {
-            const teamName = state.winnerTeam === "blue" ? "MODRÝ TÝM" : "ORANŽOVÝ TÝM";
-            const teamColor = state.winnerTeam === "blue" ? "#00aaff" : "#ff8c00";
-            winnerText.innerHTML = `<span style="color: ${teamColor}; font-weight: bold;">${teamName}</span> vyhrál!`;
-        } else if (state.winnerId) {
-            if (state.winnerId == myId) {
-                winnerText.innerHTML = '<span style="color: #00ff00; font-weight: bold;">TY JSI VYHRÁL!</span>';
-            } else {
-                winnerText.innerHTML = `Hráč <span style="color: #ff8c00; font-weight: bold;">${state.winnerId}</span> vyhrál!`;
+        // Počkáme 500ms, aby se grid stihl aktualizovat
+        setTimeout(() => {
+            if (state.mode === "2v2" && state.winnerTeam) {
+                const teamName = state.winnerTeam === "blue" ? "MODRÝ TÝM" : "ORANŽOVÝ TÝM";
+                const teamColor = state.winnerTeam === "blue" ? "#00aaff" : "#ff8c00";
+                winnerText.innerHTML = `<span style="color: ${teamColor}; font-weight: bold;">${teamName}</span> vyhrál!`;
+            } else if (state.winnerId) {
+                if (state.winnerId == myId) {
+                    winnerText.innerHTML = '<span style="color: #00ff00; font-weight: bold;">TY JSI VYHRÁL!</span>';
+                } else {
+                    winnerText.innerHTML = `Hráč <span style="color: #ff8c00; font-weight: bold;">${state.winnerId}</span> vyhrál!`;
+                }
             }
-        }
-        
-        winnerBox.style.display = 'block';
-        questionBox.style.display = 'none';
+            
+            winnerBox.style.display = 'block';
+            questionBox.style.display = 'none';
+        }, 500);
     }
 
     // Polling stavu každou sekundu
