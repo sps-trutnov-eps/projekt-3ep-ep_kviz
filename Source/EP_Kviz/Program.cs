@@ -30,6 +30,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.IsEssential = true;
     options.Cookie.HttpOnly = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.LoginPath = "/Uzivatele/Login";
 });
 
 builder.Services.AddMemoryCache(); 
