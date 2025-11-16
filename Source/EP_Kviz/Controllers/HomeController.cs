@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using EP_Kviz.Models;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace EP_Kviz.Controllers
 {
@@ -15,6 +16,15 @@ namespace EP_Kviz.Controllers
 
         public IActionResult Index()
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+
+                ViewBag.Message = "UÅ¾ivatel nenÃ­ pÅ™ihlÃ¡Å¡en";
+            }
+            else {
+                ViewBag.Message = "UÅ¾ivatel je pÅ™ihlÃ¡Å¡en";
+            }
             return View();
         }
 
@@ -38,70 +48,5 @@ namespace EP_Kviz.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-            
-
-        private static List<User> users = new();
-        private static int nextId = 1;
-
-        [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Register(RegisterViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                if (users.Any(u => u.Username == model.Username))
-                {
-                    ViewBag.Message = "Uživatel již existuje.";
-                    return View();
-                }
-
-                var user = new User
-                {
-                    Id = nextId++,
-                    Username = model.Username,
-                    Password = model.Password
-                };
-                users.Add(user);
-
-                ViewBag.RegistrationSuccess = true;
-                ModelState.Clear(); // Vyèistí formuláø
-                return View();
-            }
-            
-            ViewBag.RegistrationSuccess = false;
-            return View(model);
-        }
-
-        [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Login(LoginViewModel model)
-        {
-            var user = users.FirstOrDefault(u => u.Username == model.Username && u.Password == model.Password);
-            if (user != null)
-            {
-                // Uložení ID do session
-                HttpContext.Session.SetInt32("UserId", user.Id);
-
-                // Pøesmìrování na výbìr hry
-                return RedirectToAction("Index");
-            }
-            else
-            {
-                ViewBag.Message = "Špatné jméno nebo heslo.";
-                return View();
-            }
-        }
-
-
     }
 }

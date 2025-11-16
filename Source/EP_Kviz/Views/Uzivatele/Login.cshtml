@@ -1,4 +1,4 @@
-﻿@model LoginViewModel
+@model LoginViewModel
 
 @{
     ViewData["Title"] = "EPKvíz - Přihlášení";
@@ -44,8 +44,8 @@
             text-align: center;
             width: 100%;
             max-width: 400px;
-            background: transparent;     /* removed colored background */
-            box-shadow: none;            /* removed frame / glow */
+            background: transparent; /* removed colored background */
+            box-shadow: none; /* removed frame / glow */
         }
 
         h1 {
@@ -81,12 +81,12 @@
             transition: transform .15s, box-shadow .15s;
         }
 
-        button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 18px rgba(0,242,255,0.8);
-        }
+            button:hover {
+                transform: scale(1.05);
+                box-shadow: 0 0 18px rgba(0,242,255,0.8);
+            }
 
-        /* Make the back button match Register: positioned top-right */
+
         .home-button {
             position: absolute;
             top: 24px;
@@ -103,84 +103,80 @@
             z-index: 10;
         }
 
-        .home-button:hover {
-            transform: scale(1.07);
-            box-shadow: 0 0 18px rgba(0,242,255,0.8);
+            font-size: 1.2rem;
+        }
+        
+            .home-button:hover {
+                transform: scale(1.07);
+                box-shadow: 0 0 18px rgba(0,242,255,0.8);
             }
 
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-            min-width: 320px;
-            margin-top: 1.5rem;
+        .errorText {
+            background-color: orangered;
+            color: white;
+            padding: 1rem 1rem 1rem 1rem;
+            border-radius: 8px;
+            font-weight: bolder;
             font-size: 1.2rem;
         }
 
-        form div {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 0.5rem;
-        }
-
-        label {
-            font-size: 1.1em;
-            margin-bottom: 0.2em;
-        }
-
-        input[type="text"],
-        input[type="password"] {
-            padding: 0.7em 1em;
-            border-radius: 6px;
-            border: none;
-            font-size: 1.1em;
-            background: #1e293b;
-            color: #fff;
-            box-shadow: 0 0 6px rgba(0,255,255,0.1);
-            outline: none;
-            transition: box-shadow 0.2s;
-        }
-
-        input[type="text"]:focus,
-        input[type="password"]:focus {
-            box-shadow: 0 0 12px rgba(0,255,255,0.3);
-        }
-
-        button[type="submit"] {
-            margin-top: 0.5em;
-            padding: 0.8em 1.5em;
+        .text-danger {
+            display: block;
+            margin-top: 0.2rem;
+            padding: 0.2rem 0.2rem 0.2rem 0.2rem;
+            background-color: white;
+            color: orangered;
             border-radius: 8px;
-            border: none;
-            background: linear-gradient(180deg,#00f2ff,#0088ff);
-            color: #fff;
-            font-size: 1.2em;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 0 10px rgba(0,136,255,0.5);
-            transition: transform .15s, box-shadow .15s;
+            font-weight: bolder;
         }
 
-        button[type="submit"]:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 18px rgba(0,242,255,0.8);
+        .text-danger:empty {
+            display: none;
         }
 
-        p {
-            margin-top: 1em;
-            font-size: 1.1em;
+        .register-button{
+            display: block;
+            font-size: 1.1rem;
+            color: white;
+            margin-top: 1rem;
         }
+
     </style>
 
 </head>
 <body>
     <div class="container">
         <h1>Přihlášení</h1>
-        <form method="post">
-            <input asp-for="Username" placeholder="Uživatelské jméno" />
-            <input asp-for="Password" type="password" placeholder="Heslo" />
-            <button type="submit">Přihlásit</button>
+
+
+
+
+
+        <form asp-action="Login" method="post">
+
+            @if (ViewBag.Message != null)
+            {
+                <div class="errorText">
+                    @ViewBag.Message
+                </div>
+            }
+
+            <div class="form-group">
+                <label asp-for="Username">Uživatelské jméno</label>
+                <input asp-for="Username" class="form-control" />
+
+            </div>
+            <div class="form-group">
+                <label asp-for="Password">Uživatelské jméno</label>
+                <input asp-for="Password" class="form-control" type="password" />
+
+            </div>
+            <button type="submit" class="btn btn-primary">Přihlásit se</button>
+
         </form>
+        <a href="/Uzivatele/Register" class="register-button">Nebo se registrujte</a>
+
+
     </div>
 
     <a href="/Home/Index" class="home-button">Zpět na hlavní stránku</a>

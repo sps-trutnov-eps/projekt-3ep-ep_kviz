@@ -1,9 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using EP_Kviz.Models;
 using System.Text;
 using System.Text.Json;
 using System.IO;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 public class GamesController : Controller
 {
@@ -16,15 +21,21 @@ public class GamesController : Controller
         _cache = cache;
     }
 
+    [Authorize]
     public IActionResult Vyber()
     {
-        int? userId = HttpContext.Session.GetInt32("UserId");
-        if (userId == null)
+        // Získání přihlášeného uživatele z Identity
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        
+        if (string.IsNullOrEmpty(userId))
         {
-            return RedirectToAction("Login", "Home");
+            return RedirectToAction("Login", "Uzivatele");
         }
 
-        ViewBag.UserId = userId.Value;
+        // Pro hru použijeme hashCode userId jako číslo
+        int numericUserId = Math.Abs(userId.GetHashCode());
+        ViewBag.UserId = numericUserId;
+        
         return View();
     }
 
@@ -37,6 +48,7 @@ public class GamesController : Controller
             GameId = gameId,
             Mode = "1v1",
             Players = new List<int> { pid },
+            Scores = new Dictionary<int, int> { { pid, 0 } },
             CreatedAt = DateTime.Now
         };
 
@@ -53,6 +65,7 @@ public class GamesController : Controller
             GameId = gameId,
             Mode = "2v2",
             Players = new List<int> { pid },
+            Scores = new Dictionary<int, int> { { pid, 0 } },
             CreatedAt = DateTime.Now
         };
 
@@ -72,6 +85,7 @@ public class GamesController : Controller
             GameId = gameId,
             Mode = "Procvičení",
             Players = new List<int> { pid },
+            Scores = new Dictionary<int, int> { { pid, 0 } },
             CreatedAt = DateTime.Now
         };
 
@@ -109,9 +123,15 @@ public class GamesController : Controller
                 {
                     EnsureGridInitialized(game);
                 }
-
-                _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
             }
+
+            if (game.Scores == null)
+                game.Scores = new Dictionary<int, int>();
+
+            if (!game.Scores.ContainsKey(pid))
+                game.Scores[pid] = 0;
+
+            _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
 
             return RedirectToAction("Play", new { gameId = gameId, pid = pid });
         }
@@ -230,7 +250,11 @@ public class GamesController : Controller
                 pending = game.PendingQuestion != null ? new { 
                     game.PendingQuestion.CellId, 
                     game.PendingQuestion.AskedByPlayerId 
-                } : null
+                } : null,
+                scores = game.Scores ?? new Dictionary<int, int>(),
+                isGameOver = game.IsGameOver,
+                winnerId = game.WinnerId,
+                winnerTeam = game.WinnerTeam
             });
         }
         return Json(new { error = "Game not found" });
@@ -303,6 +327,9 @@ public class GamesController : Controller
         {
             cell.OwnerPlayerId = pid;
             cell.IsAnswered = true;
+            
+            // Kontrola výhry po správné odpovědi
+            game.CheckWinner();
         }
         else
         {
@@ -311,7 +338,12 @@ public class GamesController : Controller
         }
 
         game.PendingQuestion = null;
-        game.CurrentTurnPlayerId = game.GetNextPlayer(pid);
+        
+        // Pouze pokud hra ještě neskončila, přepneme na dalšího hráče
+        if (!game.IsGameOver)
+        {
+            game.CurrentTurnPlayerId = game.GetNextPlayer(pid);
+        }
         
         _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
 
@@ -322,7 +354,10 @@ public class GamesController : Controller
             owner = cell.OwnerPlayerId,
             cellId = cellId,
             nextTurn = game.CurrentTurnPlayerId,
-            team = game.Mode == "2v2" ? game.GetPlayerTeam(cell.OwnerPlayerId ?? -1) : null
+            team = game.Mode == "2v2" ? game.GetPlayerTeam(cell.OwnerPlayerId ?? -1) : null,
+            isGameOver = game.IsGameOver,
+            winnerId = game.WinnerId,
+            winnerTeam = game.WinnerTeam
         });
     }
 
