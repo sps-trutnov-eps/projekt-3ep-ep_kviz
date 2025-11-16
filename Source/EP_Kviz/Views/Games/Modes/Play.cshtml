@@ -67,6 +67,44 @@
             background: linear-gradient(180deg,#0088ff,#00f2ff);
             transform: scale(1.05);
         }
+
+        #winnerBox {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            color: #fff;
+            padding: 3rem;
+            border-radius: 16px;
+            text-align: center;
+            z-index: 1000;
+            box-shadow: 0 0 30px rgba(0, 242, 255, 0.8);
+            border: 3px solid #00f2ff;
+        }
+
+        #winnerBox h2 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+        }
+
+        #winnerBox p {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        #questionBox {
+            display: none;
+            margin-top: 1rem;
+            background: #222;
+            color: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 500px;
+        }
     </style>
 </head>
 <body>
@@ -82,6 +120,13 @@
 
 <div id="gridWrapper" style="display:grid; grid-template-columns: repeat(5, 1fr); gap:12px; max-width:420px; margin-bottom:1rem;">
     @* Grid s 25 tlačítky se vytvoří dynamicky JavaScriptem *@
+</div>
+
+<div id="winnerBox" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.95); color: #fff; padding: 3rem; border-radius: 16px; text-align: center; z-index: 1000; box-shadow: 0 0 30px rgba(0,242,255,0.8); border: 3px solid #00f2ff;">
+    <h2 style="font-size: 3rem; margin-bottom: 1rem; text-shadow: 0 0 20px rgba(0,255,255,0.8);">🎉 VÍTĚZ! 🎉</h2>
+    <p id="winnerText" style="font-size: 1.5rem; margin-bottom: 2rem;"></p>
+    <button onclick="window.location.href='/Games/Vyber'" class="button" style="font-size: 1.2rem; padding: 1rem 2rem;">Nová hra</button>
+    <button onclick="window.location.href='/Home/Index'" class="button" style="font-size: 1.2rem; padding: 1rem 2rem; margin-left: 1rem;">Hlavní menu</button>
 </div>
 
 <div id="questionBox" style="display:none; margin-top:1rem; background:#222; color:#fff; padding:1rem; border-radius:8px; width: 100%; max-width: 500px;">
@@ -102,36 +147,6 @@
     const submitAnswerBtn = document.getElementById('submitAnswerBtn');
     let localPending = null;
     const playerId = @playerId;
-
-    // Aktualizace UI
-    function updateUI(data) {
-        if (!data) return;
-        document.getElementById('playerCount').textContent = data.playerCount ?? document.getElementById('playerCount').textContent;
-        if (data.players) document.getElementById('playerList').textContent = data.players.join(', ');
-
-        const scores = data.scores || {};
-        const scoreList = document.getElementById('scoreList');
-        scoreList.innerHTML = '';
-
-        const players = data.players || [];
-        if (players.length === 0) {
-            for (const [id, s] of Object.entries(scores)) {
-                const li = document.createElement('li');
-                li.textContent = `${id}: ${s}`;
-                if (parseInt(id) === parseInt(playerId)) li.style.fontWeight = '700';
-                scoreList.appendChild(li);
-            }
-        } else {
-            for (const id of players) {
-                const sc = scores[id] ?? 0;
-                const li = document.createElement('li');
-                li.id = `score_${id}`;
-                li.textContent = `${id}: ${sc}`;
-                if (parseInt(id) === parseInt(playerId)) li.style.fontWeight = '700';
-                scoreList.appendChild(li);
-            }
-        }
-    }
 
     // Vytvoření gridu 5x5
     function renderEmptyGrid() {
@@ -180,24 +195,42 @@
         answerInput.focus();
     }
 
-    submitAnswerBtn.addEventListener('click', () => {
+    submitAnswerBtn.addEventListener('click', submitAnswer);
+    
+    // Přidání funkce pro Enter key
+    answerInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            submitAnswer();
+        }
+    });
+    
+    function submitAnswer() {
         if (!localPending) return;
         const ans = answerInput.value || '';
         fetch(`/Games/SubmitAnswer?gameId=${gameIdElem.textContent}&pid=${myId}&cellId=${localPending.cellId}&answer=${encodeURIComponent(ans)}`, { method: 'POST' })
             .then(r => r.json())
             .then(json => {
                 if (json.error) { alert(json.error); return; }
+                
+                // Kontrola výhry
+                if (json.isGameOver) {
+                    updateGridFromState(json);
+                    localPending = null;
+                    questionBox.style.display = 'none';
+                    return;
+                }
+                
                 updateGridFromState(json);
                 localPending = null;
                 questionBox.style.display = 'none';
             })
             .catch(err => console.error(err));
-    });
+    }
 
     function updateGridFromState(res) {
         if (!res.cellId && !res.grid) return;
         fetch(`/Games/GetGameState?gameId=${gameIdElem.textContent}`)
-            .then(r => r.json())
+            .then r => r.json())
             .then(json => {
                 if (json.error) return;
                 applyStateToGrid(json);
@@ -207,6 +240,17 @@
     function applyStateToGrid(state) {
         const buttons = Array.from(document.getElementsByClassName('cellButton'));
         const hasEnoughPlayers = state.canStart;
+        
+        // Kontrola výhry
+        if (state.isGameOver) {
+            showWinner(state);
+            // Zablokovat všechna tlačítka
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.style.cursor = 'not-allowed';
+            });
+            return;
+        }
         
         // Aktualizace informací o hře
         if (state.mode === "2v2" && state.teams) {
@@ -293,6 +337,26 @@
                 }
             }
         });
+    }
+
+    function showWinner(state) {
+        const winnerBox = document.getElementById('winnerBox');
+        const winnerText = document.getElementById('winnerText');
+        
+        if (state.mode === "2v2" && state.winnerTeam) {
+            const teamName = state.winnerTeam === "blue" ? "MODRÝ TÝM" : "ORANŽOVÝ TÝM";
+            const teamColor = state.winnerTeam === "blue" ? "#00aaff" : "#ff8c00";
+            winnerText.innerHTML = `<span style="color: ${teamColor}; font-weight: bold;">${teamName}</span> vyhrál!`;
+        } else if (state.winnerId) {
+            if (state.winnerId == myId) {
+                winnerText.innerHTML = '<span style="color: #00ff00; font-weight: bold;">TY JSI VYHRÁL!</span>';
+            } else {
+                winnerText.innerHTML = `Hráč <span style="color: #ff8c00; font-weight: bold;">${state.winnerId}</span> vyhrál!`;
+            }
+        }
+        
+        winnerBox.style.display = 'block';
+        questionBox.style.display = 'none';
     }
 
     // Polling stavu každou sekundu

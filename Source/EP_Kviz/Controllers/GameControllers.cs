@@ -251,7 +251,10 @@ public class GamesController : Controller
                     game.PendingQuestion.CellId, 
                     game.PendingQuestion.AskedByPlayerId 
                 } : null,
-                scores = game.Scores ?? new Dictionary<int, int>()
+                scores = game.Scores ?? new Dictionary<int, int>(),
+                isGameOver = game.IsGameOver,
+                winnerId = game.WinnerId,
+                winnerTeam = game.WinnerTeam
             });
         }
         return Json(new { error = "Game not found" });
@@ -324,6 +327,9 @@ public class GamesController : Controller
         {
             cell.OwnerPlayerId = pid;
             cell.IsAnswered = true;
+            
+            // Kontrola výhry po správné odpovědi
+            game.CheckWinner();
         }
         else
         {
@@ -332,7 +338,12 @@ public class GamesController : Controller
         }
 
         game.PendingQuestion = null;
-        game.CurrentTurnPlayerId = game.GetNextPlayer(pid);
+        
+        // Pouze pokud hra ještě neskončila, přepneme na dalšího hráče
+        if (!game.IsGameOver)
+        {
+            game.CurrentTurnPlayerId = game.GetNextPlayer(pid);
+        }
         
         _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
 
@@ -343,7 +354,10 @@ public class GamesController : Controller
             owner = cell.OwnerPlayerId,
             cellId = cellId,
             nextTurn = game.CurrentTurnPlayerId,
-            team = game.Mode == "2v2" ? game.GetPlayerTeam(cell.OwnerPlayerId ?? -1) : null
+            team = game.Mode == "2v2" ? game.GetPlayerTeam(cell.OwnerPlayerId ?? -1) : null,
+            isGameOver = game.IsGameOver,
+            winnerId = game.WinnerId,
+            winnerTeam = game.WinnerTeam
         });
     }
 
