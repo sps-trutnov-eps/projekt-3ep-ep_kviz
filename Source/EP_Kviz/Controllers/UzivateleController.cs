@@ -26,9 +26,25 @@ namespace EP_Kviz.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (model == null || string.IsNullOrEmpty(model.Username) || string.IsNullOrEmpty(model.Password) || string.IsNullOrEmpty(model.Email))
+            if (model == null)
             {
-                ViewBag.Message = "Neplatné údaje.";
+                ViewBag.Message = "Něco se nepovedlo.";
+                return View();
+            }
+            if (string.IsNullOrEmpty(model.Username) && (string.IsNullOrEmpty(model.Password)))
+            {
+                ViewBag.Message = "Vyplňte všechny pole.";
+                return View();
+            }
+
+            if (string.IsNullOrEmpty(model.Username))
+            {
+                ViewBag.Message = "Zadejte uživatelské jméno";
+                return View();
+            }
+            if (string.IsNullOrEmpty(model.Password))
+                {
+                ViewBag.Message = "Zadejte heslo.";
                 return View();
             }
 
@@ -48,7 +64,6 @@ namespace EP_Kviz.Controllers
             var newuser = new UzivateleModel
             {
                 UserName = model.Username,
-                Email = model.Email
             };
 
             var result = await _userManager.CreateAsync(newuser, model.Password);
@@ -72,21 +87,21 @@ namespace EP_Kviz.Controllers
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (model == null) throw new ArgumentNullException(nameof(model));
-            if (string.IsNullOrEmpty(model.Username) && string.IsNullOrEmpty(model.Password))
+            if (string.IsNullOrEmpty(model.Password) && (string.IsNullOrEmpty(model.Username)))
             {
                 ViewBag.Message = "Zadejte přihlašovací údaje.";
-                return View();
-            }
-            if (string.IsNullOrEmpty(model.Password))
-            {
-                ViewBag.Message = "Neplatné údaje. " +
-                    "Zadejte heslo";
                 return View();
             }
             if (string.IsNullOrEmpty(model.Username))
             {
                 ViewBag.Message = "Neplatné údaje. " +
                     "Zadejte uživatelské jméno";
+                return View();
+            }
+            if (string.IsNullOrEmpty(model.Password))
+            {
+                ViewBag.Message = "Neplatné údaje. " +
+                    "Zadejte heslo";
                 return View();
             }
 
