@@ -96,6 +96,29 @@ public class GamesController : Controller
         return RedirectToAction("Play", new { gameId = gameId, pid = pid });
     }
 
+    public IActionResult FullBlockMode(int pid)
+    {
+        int gameId = GenerateRandomGameId();
+
+        var game = new GameSession
+        {
+            GameId = gameId,
+            Mode = "FullBlock",
+            Players = new List<int> { pid },
+            Scores = new Dictionary<int, int> { { pid, 0 } },
+            CreatedAt = DateTime.Now,
+            PlayerTeams = new Dictionary<int, string>() // Ensure PlayerTeams is initialized
+        };
+
+        // Instead of directly assigning to CanStart, use a method or logic to handle its state
+        game.EnsurePlayer(pid); // Call a method to ensure the player is added
+
+        _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
+        return RedirectToAction("Play", new { gameId = gameId, pid = pid });
+    }
+
+
+
     public IActionResult Join(int gameId, int pid)
     {
         if (_cache.TryGetValue($"game_{gameId}", out GameSession game))
@@ -110,7 +133,7 @@ public class GamesController : Controller
             if (!game.Players.Contains(pid))
             {
                 game.Players.Add(pid);
-                
+
                 // Přiřazení týmu pro 2v2
                 if (game.Mode == "2v2")
                 {
@@ -119,9 +142,13 @@ public class GamesController : Controller
                 }
 
                 // Pokud je teď dost hráčů, inicializuj grid
-                if (game.CanStart && (game.Grid == null || game.Grid.Count == 0))
+                if (game.Players.Count == game.RequiredPlayers)
                 {
-                    EnsureGridInitialized(game);
+                    game.CheckWinner();
+                    if (game.Grid == null || game.Grid.Count == 0)
+                    {
+                        EnsureGridInitialized(game);
+                    }
                 }
             }
 
@@ -142,10 +169,11 @@ public class GamesController : Controller
         }
     }
 
+
     private void EnsureGridInitialized(GameSession game)
     {
         if (game.Grid?.Count == 25) return;
-        if (!game.CanStart) return;
+        if (!game.CanStart) return; // Explicitly disambiguate the property
 
         game.Grid = new List<Cell>();
         char label = 'A';
@@ -164,6 +192,10 @@ public class GamesController : Controller
             // První modrý hráč začíná
             game.CurrentTurnPlayerId = game.Players.First(p => game.GetPlayerTeam(p) == "blue");
         }
+        else if (game.Mode == "FullBlock")
+        {
+            game.CurrentTurnPlayerId = game.Players[0];
+        }
         else // 1v1
         {
             game.CurrentTurnPlayerId = game.Players[0];
@@ -171,6 +203,10 @@ public class GamesController : Controller
 
         game.PendingQuestion = null;
     }
+
+
+    private static int _questionIndex = 0;
+    private static readonly object _questionIndexLock = new object();
 
     private List<(string Q, string A)> LoadQuestions()
     {
@@ -204,6 +240,22 @@ public class GamesController : Controller
             return _questionsCache;
         }
     }
+    private (string Q, string A) GetNextQuestion()
+    {
+        var questions = LoadQuestions();
+        if (questions == null || questions.Count == 0)
+            return ("", "");
+
+        lock (_questionIndexLock)
+        {
+            var q = questions[_questionIndex];
+            _questionIndex++;
+            if (_questionIndex >= questions.Count)
+                _questionIndex = 0;
+            return q;
+        }
+    }
+
 
     public IActionResult Play(int gameId, int pid)
     {
@@ -273,18 +325,17 @@ public class GamesController : Controller
             return Json(new { error = "Není tvůj tah." });
 
         var cell = game.Grid?.FirstOrDefault(c => c.Id == cellId);
-        if (cell == null) 
+        if (cell == null)
             return Json(new { error = "Neplatná buňka." });
 
-        if (cell.IsAnswered) 
+        if (cell.IsAnswered)
             return Json(new { error = "Buňka už byla zodpovězena." });
 
         var questions = LoadQuestions();
         if (questions == null || questions.Count == 0)
             return Json(new { error = "Žádné otázky dostupné." });
 
-        var rnd = new Random();
-        var q = questions[rnd.Next(questions.Count)];
+        var q = GetNextQuestion();
 
         game.PendingQuestion = new PendingQuestion
         {
@@ -295,8 +346,32 @@ public class GamesController : Controller
         };
 
         _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
+
+        // LOGOVÁNÍ
+        System.Diagnostics.Debug.WriteLine($"[RequestQuestion] gameId={gameId}, pid={pid}, cellId={cellId}, Otázka: {q.Q}, Odpověď: {q.A}");
+
         return Json(new { ok = true, question = q.Q, cellId = cellId });
     }
+
+
+    private string NormalizeAnswer(string input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+            return "";
+
+        var normalized = input.Trim().ToLowerInvariant();
+        normalized = normalized.Normalize(System.Text.NormalizationForm.FormD);
+        var sb = new System.Text.StringBuilder();
+        foreach (var c in normalized)
+        {
+            if (System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c) != System.Globalization.UnicodeCategory.NonSpacingMark
+                && !char.IsWhiteSpace(c))
+                sb.Append(c);
+        }
+        return sb.ToString().Normalize(System.Text.NormalizationForm.FormC);
+    }
+
+
 
     [HttpPost]
     public IActionResult SubmitAnswer(int gameId, int pid, int cellId, string answer)
@@ -316,20 +391,51 @@ public class GamesController : Controller
         if (game.PendingQuestion.AskedByPlayerId != pid)
             return Json(new { error = "Nemůžeš odpovědět na otázku, kterou nepožádal tvůj tah." });
 
-        var correct = string.Equals(
-            (game.PendingQuestion.Answer ?? "").Trim(),
-            (answer ?? "").Trim(),
-            StringComparison.OrdinalIgnoreCase
-        );
+        var correct = NormalizeAnswer(game.PendingQuestion.Answer) == NormalizeAnswer(answer);
+
+        // LOGOVÁNÍ
+        System.Diagnostics.Debug.WriteLine($"[SubmitAnswer] gameId={gameId}, pid={pid}, cellId={cellId}");
+        System.Diagnostics.Debug.WriteLine($"Zadaná odpověď: '{answer}', Správná odpověď: '{game.PendingQuestion.Answer}'");
+        System.Diagnostics.Debug.WriteLine($"Porovnání: '{NormalizeAnswer(game.PendingQuestion.Answer)}' == '{NormalizeAnswer(answer)}' => {correct}");
 
         var cell = game.Grid.First(c => c.Id == cellId);
         if (correct)
         {
             cell.OwnerPlayerId = pid;
             cell.IsAnswered = true;
-            
-            // Kontrola výhry po správné odpovědi
-            game.CheckWinner();
+
+            if (game.Mode == "FullBlock")
+            {
+                // Pokud jsou všechna pole zodpovězena, určete vítěze
+                if (game.Grid.All(c => c.IsAnswered))
+                {
+                    // Spočítejte počet polí pro každého hráče
+                    var playerCounts = game.Players.ToDictionary(
+                        p => p,
+                        p => game.Grid.Count(c => c.OwnerPlayerId == p)
+                    );
+
+                    // Najděte hráče s nejvyšším počtem polí
+                    var max = playerCounts.Values.Max();
+                    var winners = playerCounts.Where(kv => kv.Value == max).Select(kv => kv.Key).ToList();
+
+                    if (winners.Count == 1)
+                    {
+                        game.WinnerId = winners[0];
+                    }
+                    else
+                    {
+                        game.WinnerId = null; // Remíza
+                    }
+
+                    game.CheckWinner(); // Předpokládáme, že tato metoda nastaví `IsGameOver` na true
+                }
+
+            }
+            else
+            {
+                game.CheckWinner();
+            }
         }
         else
         {
@@ -337,14 +443,14 @@ public class GamesController : Controller
             cell.IsAnswered = false;  // lze znovu odpovídat
         }
 
+
         game.PendingQuestion = null;
-        
-        // Pouze pokud hra ještě neskončila, přepneme na dalšího hráče
+
         if (!game.IsGameOver)
         {
             game.CurrentTurnPlayerId = game.GetNextPlayer(pid);
         }
-        
+
         _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
 
         return Json(new
@@ -361,9 +467,9 @@ public class GamesController : Controller
         });
     }
 
+
     private int GenerateRandomGameId()
     {
-        var random = new Random();
-        return random.Next(100000, 999999);
+        return Random.Shared.Next(100000, 999999);
     }
 }

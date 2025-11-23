@@ -29,6 +29,7 @@ namespace EP_Kviz.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public bool IsActive { get; set; } = true;
 
+
         // Nové pro hru
         public List<Cell> Grid { get; set; } = new List<Cell>();
         public int? CurrentTurnPlayerId { get; set; } = null;
@@ -49,6 +50,7 @@ namespace EP_Kviz.Models
             "Procvičení" => PLAYERS_PROCVICENI,
             "1v1" => PLAYERS_1V1,
             "2v2" => PLAYERS_2V2,
+            "FullBlock" => PLAYERS_1V1,
             _ => 2 // výchozí hodnota
         };
 
@@ -64,6 +66,7 @@ namespace EP_Kviz.Models
             "Procvičení" => Players.Count >= PLAYERS_PROCVICENI,
             "1v1" => Players.Count >= PLAYERS_1V1,
             "2v2" => Players.Count >= PLAYERS_2V2,
+            "FullBlock" => Players.Count >= PLAYERS_1V1,
             _ => false
         };
 
