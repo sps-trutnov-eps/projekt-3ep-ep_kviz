@@ -252,8 +252,7 @@
             `;
         } else if (state.mode === "Duel") {
             document.getElementById('playerList').innerHTML = `
-                🔥 DUEL! První špatná odpověď = prohra!<br>
-                Hráči: ${state.players.join(' vs ')} (${state.playerCount}/${state.requiredPlayers})
+                ${state.players.join(' vs ')} (${state.playerCount}/${state.requiredPlayers})
             `;
         } else {
             document.getElementById('playerList').innerHTML = `
