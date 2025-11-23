@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Cryptography;
 
 public class GamesController : Controller
 {
@@ -33,7 +34,12 @@ public class GamesController : Controller
         }
 
         // Pro hru použijeme hashCode userId jako číslo
-        int numericUserId = Math.Abs(userId.GetHashCode());
+        int numericUserId = 0;
+        using (var sha256 = SHA256.Create())
+        {
+            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(userId));
+            numericUserId = Math.Abs(BitConverter.ToInt32(hashBytes, 0));
+        }
         ViewBag.UserId = numericUserId;
         
         return View();
