@@ -35,6 +35,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddMemoryCache(); 
 builder.Services.AddSingleton<EP_Kviz.Services.GameManager>();
+builder.Services.AddScoped<EP_Kviz.Services.IScoreService, EP_Kviz.Services.ScoreService>();
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 

@@ -147,6 +147,12 @@
     const submitAnswerBtn = document.getElementById('submitAnswerBtn');
     let localPending = null;
     const playerId = @playerId;
+    
+    // Timer pro měření času hry
+    let gameStartTime = null;
+    let gameEndTime = null;
+    let timerStarted = false;
+    let scoreSubmitted = false;
 
     // Vytvoření gridu 5x5
     function renderEmptyGrid() {
@@ -240,6 +246,13 @@
     function applyStateToGrid(state) {
         const buttons = Array.from(document.getElementsByClassName('cellButton'));
         const hasEnoughPlayers = state.canStart;
+        
+        // Spustit timer při prvním tahu
+        if (hasEnoughPlayers && !timerStarted && state.grid && state.grid.length > 0) {
+            gameStartTime = Date.now();
+            timerStarted = true;
+            console.log('Timer started!');
+        }
         
         // Aktualizace informací o hře
         if (state.mode === "2v2" && state.teams) {
@@ -344,6 +357,17 @@
         const winnerBox = document.getElementById('winnerBox');
         const winnerText = document.getElementById('winnerText');
         
+        // Zastavit timer a uložit skóre
+        if (!scoreSubmitted) {
+            gameEndTime = Date.now();
+            if (gameStartTime && state.winnerId == myId) {
+                // Pouze pokud jsme vyhráli, pošleme skóre
+                const elapsedMs = gameEndTime - gameStartTime;
+                submitScore(elapsedMs, state.mode);
+            }
+            scoreSubmitted = true;
+        }
+        
         // Počkáme 500ms, aby se grid stihl aktualizovat
         setTimeout(() => {
             if (state.mode === "2v2" && state.winnerTeam) {
@@ -361,6 +385,33 @@
             winnerBox.style.display = 'block';
             questionBox.style.display = 'none';
         }, 500);
+    }
+
+    // Funkce pro odeslání skóre na server
+    async function submitScore(elapsedMs, gameMode) {
+        try {
+            // Získat informace o přihlášeném uživateli
+            const response = await fetch('/api/scores', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    playerId: '@User.Identity?.Name', // Email/username z Identity
+                    username: '@User.Identity?.Name' || 'Hráč ' + playerId,
+                    elapsedMs: elapsedMs,
+                    gameMode: gameMode
+                })
+            });
+            
+            if (response.ok) {
+                console.log('Skóre úspěšně uloženo');
+            } else {
+                console.warn('Nepodařilo se uložit skóre:', response.status);
+            }
+        } catch (error) {
+            console.error('Chyba při ukládání skóre:', error);
+        }
     }
 
     // Polling stavu každou sekundu

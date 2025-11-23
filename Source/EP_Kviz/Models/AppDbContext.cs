@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 public class AppDbContext : IdentityDbContext<UzivateleModel>
 {
+    public DbSet<ScoreEntry> Scores { get; set; }
+
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
