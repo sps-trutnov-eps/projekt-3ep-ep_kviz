@@ -38,7 +38,8 @@ namespace EP_Kviz.Services
                 PlayerId = playerId,
                 Username = username,
                 ElapsedMs = elapsedMs,
-                Score = (int)elapsedMs, // Score = ElapsedMs pro jednoduché třídění
+                // Cap Score to int.MaxValue to prevent overflow
+                Score = elapsedMs > int.MaxValue ? int.MaxValue : (int)elapsedMs,
                 GameMode = gameMode,
                 CreatedAt = DateTime.UtcNow
             };

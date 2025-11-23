@@ -7,6 +7,7 @@ namespace EP_Kviz.Controllers
     {
         private readonly IScoreService _scoreService;
         private readonly ILogger<ScoreboardController> _logger;
+        private const int PageSize = 50;
 
         public ScoreboardController(IScoreService scoreService, ILogger<ScoreboardController> logger)
         {
@@ -20,11 +21,12 @@ namespace EP_Kviz.Controllers
             {
                 ViewBag.GameMode = gameMode;
                 ViewBag.CurrentPage = page;
+                ViewBag.PageSize = PageSize;
 
-                var scores = await _scoreService.GetScoresAsync(page, 50, gameMode);
+                var scores = await _scoreService.GetScoresAsync(page, PageSize, gameMode);
                 var totalCount = await _scoreService.GetScoreCountAsync(gameMode);
                 
-                ViewBag.TotalPages = (int)Math.Ceiling(totalCount / 50.0);
+                ViewBag.TotalPages = (int)Math.Ceiling(totalCount / (double)PageSize);
                 
                 return View(scores);
             }

@@ -76,11 +76,14 @@ namespace EP_Kviz.Controllers
             try
             {
                 List<Models.ScoreEntry> scores;
+                int startRank = 1;
 
                 if (page.HasValue)
                 {
                     // Stránkování
-                    scores = await _scoreService.GetScoresAsync(page.Value, top ?? 50, gameMode);
+                    int pageSize = top ?? 50;
+                    scores = await _scoreService.GetScoresAsync(page.Value, pageSize, gameMode);
+                    startRank = (page.Value - 1) * pageSize + 1;
                 }
                 else
                 {
@@ -90,7 +93,7 @@ namespace EP_Kviz.Controllers
 
                 var result = scores.Select((s, index) => new
                 {
-                    rank = index + 1,
+                    rank = startRank + index,
                     id = s.Id,
                     playerId = s.PlayerId,
                     username = s.Username ?? $"Hráč {s.PlayerId ?? "Anonym"}",

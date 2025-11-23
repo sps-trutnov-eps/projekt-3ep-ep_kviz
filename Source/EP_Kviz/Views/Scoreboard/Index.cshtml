@@ -4,169 +4,166 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<head>
-    <style>
-        body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: #fff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            min-height: 100vh;
-            padding: 2rem;
-        }
+<style>
+    body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: #fff;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        padding: 2rem;
+    }
 
-        .scoreboard-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 2rem;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
+    .scoreboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 20px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
 
-        h1 {
-            text-align: center;
-            font-size: 2.5rem;
-            margin-bottom: 2rem;
-            background: linear-gradient(90deg, #00f2ff, #0088ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
+    h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        background: linear-gradient(90deg, #00f2ff, #0088ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
 
-        .filter-section {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
+    .filter-section {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        flex-wrap: wrap;
+    }
 
-        .filter-button {
-            padding: 0.7rem 1.5rem;
-            border: 2px solid #0088ff;
-            border-radius: 8px;
-            background: transparent;
-            color: #fff;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
+    .filter-button {
+        padding: 0.7rem 1.5rem;
+        border: 2px solid #0088ff;
+        border-radius: 8px;
+        background: transparent;
+        color: #fff;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
 
-        .filter-button:hover {
-            background: #0088ff;
-            transform: scale(1.05);
-        }
+    .filter-button:hover {
+        background: #0088ff;
+        transform: scale(1.05);
+    }
 
-        .filter-button.active {
-            background: linear-gradient(180deg, #00f2ff, #0088ff);
-            border-color: #00f2ff;
-        }
+    .filter-button.active {
+        background: linear-gradient(180deg, #00f2ff, #0088ff);
+        border-color: #00f2ff;
+    }
 
-        .scoreboard-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
+    .scoreboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
 
-        .scoreboard-table thead {
-            background: linear-gradient(180deg, #00f2ff, #0088ff);
-        }
+    .scoreboard-table thead {
+        background: linear-gradient(180deg, #00f2ff, #0088ff);
+    }
 
-        .scoreboard-table th {
-            padding: 1rem;
-            text-align: left;
-            font-weight: 700;
-            color: #fff;
-        }
+    .scoreboard-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 700;
+        color: #fff;
+    }
 
-        .scoreboard-table th:first-child {
-            border-top-left-radius: 10px;
-        }
+    .scoreboard-table th:first-child {
+        border-top-left-radius: 10px;
+    }
 
-        .scoreboard-table th:last-child {
-            border-top-right-radius: 10px;
-        }
+    .scoreboard-table th:last-child {
+        border-top-right-radius: 10px;
+    }
 
-        .scoreboard-table tbody tr {
-            background: rgba(255, 255, 255, 0.03);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
+    .scoreboard-table tbody tr {
+        background: rgba(255, 255, 255, 0.03);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+    }
 
-        .scoreboard-table tbody tr:hover {
-            background: rgba(0, 136, 255, 0.2);
-            transform: scale(1.01);
-        }
+    .scoreboard-table tbody tr:hover {
+        background: rgba(0, 136, 255, 0.2);
+        transform: scale(1.01);
+    }
 
-        .scoreboard-table td {
-            padding: 1rem;
-        }
+    .scoreboard-table td {
+        padding: 1rem;
+    }
 
-        .rank {
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: #00f2ff;
-        }
+    .rank {
+        font-weight: 700;
+        font-size: 1.2rem;
+        color: #00f2ff;
+    }
 
-        .rank-1 { color: #ffd700; }
-        .rank-2 { color: #c0c0c0; }
-        .rank-3 { color: #cd7f32; }
+    .rank-1 { color: #ffd700; }
+    .rank-2 { color: #c0c0c0; }
+    .rank-3 { color: #cd7f32; }
 
-        .back-button {
-            display: inline-block;
-            margin-top: 2rem;
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            background: linear-gradient(180deg, #00f2ff, #0088ff);
-            color: #fff;
-            text-decoration: none;
-            box-shadow: 0 0 14px rgba(0, 136, 255, 0.6);
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-        }
+    .back-button {
+        display: inline-block;
+        margin-top: 2rem;
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 700;
+        background: linear-gradient(180deg, #00f2ff, #0088ff);
+        color: #fff;
+        text-decoration: none;
+        box-shadow: 0 0 14px rgba(0, 136, 255, 0.6);
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
 
-        .back-button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(0, 242, 255, 0.9);
-        }
+    .back-button:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 20px rgba(0, 242, 255, 0.9);
+    }
 
-        .no-scores {
-            text-align: center;
-            padding: 3rem;
-            font-size: 1.2rem;
-            color: rgba(255, 255, 255, 0.6);
-        }
+    .no-scores {
+        text-align: center;
+        padding: 3rem;
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.6);
+    }
 
-        .pagination {
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            margin-top: 2rem;
-        }
+    .pagination {
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+    }
 
-        .pagination a, .pagination span {
-            padding: 0.5rem 1rem;
-            border: 2px solid #0088ff;
-            border-radius: 8px;
-            color: #fff;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
+    .pagination a, .pagination span {
+        padding: 0.5rem 1rem;
+        border: 2px solid #0088ff;
+        border-radius: 8px;
+        color: #fff;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
 
-        .pagination a:hover {
-            background: #0088ff;
-        }
+    .pagination a:hover {
+        background: #0088ff;
+    }
 
-        .pagination .current {
-            background: linear-gradient(180deg, #00f2ff, #0088ff);
-            border-color: #00f2ff;
-        }
-    </style>
-</head>
+    .pagination .current {
+        background: linear-gradient(180deg, #00f2ff, #0088ff);
+        border-color: #00f2ff;
+    }
+</style>
 
-<body>
-    <div class="scoreboard-container">
+<div class="scoreboard-container">
         <h1>🏆 Tabulka skóre</h1>
 
         <div class="filter-section">
@@ -198,7 +195,9 @@
                 </thead>
                 <tbody>
                     @{
-                        int startRank = ((ViewBag.CurrentPage ?? 1) - 1) * 50 + 1;
+                        int pageSize = ViewBag.PageSize ?? 50;
+                        int startRank = ((ViewBag.CurrentPage ?? 1) - 1) * pageSize + 1;
+                        const int MaxPaginationPages = 10;
                     }
                     @for (int i = 0; i < Model.Count; i++)
                     {
@@ -229,7 +228,7 @@
                         </a>
                     }
                     
-                    @for (int p = 1; p <= ViewBag.TotalPages && p <= 10; p++)
+                    @for (int p = 1; p <= ViewBag.TotalPages && p <= MaxPaginationPages; p++)
                     {
                         if (p == ViewBag.CurrentPage)
                         {
@@ -262,4 +261,3 @@
             <a href="/Home/Index" class="back-button">← Zpět do hlavního menu</a>
         </div>
     </div>
-</body>

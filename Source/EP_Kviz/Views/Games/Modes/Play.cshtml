@@ -391,14 +391,17 @@
     async function submitScore(elapsedMs, gameMode) {
         try {
             // Získat informace o přihlášeném uživateli
+            const userName = '@(User.Identity?.Name ?? "")';
+            const effectiveUsername = userName || 'Hráč ' + playerId;
+            
             const response = await fetch('/api/scores', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    playerId: '@User.Identity?.Name', // Email/username z Identity
-                    username: '@User.Identity?.Name' || 'Hráč ' + playerId,
+                    playerId: userName || null,
+                    username: effectiveUsername,
                     elapsedMs: elapsedMs,
                     gameMode: gameMode
                 })
