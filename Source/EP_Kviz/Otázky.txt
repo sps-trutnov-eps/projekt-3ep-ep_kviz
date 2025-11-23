@@ -1,18 +1,18 @@
-Jaký učitel používá zkratku PZ a říká tak žákům? /Nymš
-Jaký učitel říkal žákům "saláti"? /Kotek
-Jaký učitel říká panu učitelu Košátkovi "Košťátko"? /Nymš
-Jaký učitel během hodiny přeložil slovo "interface" jako meziobličej? /Nymš
-Jaký učitel říká "mrkvosoft"? /Nymš
-Jaký učitel vytvořil virální video kde zmiňuje že to nebude dělat? /Šenkýř
-U jakého učitele jsem při hodinách koukali na idioty za volantem? /Loufek
-Jaký učitel hodnotil písemky podle tzv. "kola štěstí"? /Mareš
+Jaký učitel používá zkratku PZ a říká tak žákům?  (stačí příjmení) /Nymš
+Jaký učitel říkal žákům "saláti"?  (stačí příjmení) /Kotek
+Jaký učitel říká panu učitelu Košátkovi "Košťátko"?  (stačí příjmení) /Nymš
+Jaký učitel během hodiny přeložil slovo "interface" jako meziobličej?  (stačí příjmení) /Nymš
+Jaký učitel říká "mrkvosoft"?  (stačí příjmení) /Nymš
+Jaký učitel vytvořil virální video kde zmiňuje že to nebude dělat?  (stačí příjmení) /Šenkýř
+U jakého učitele jsem při hodinách koukali na idioty za volantem?  (stačí příjmení) /Loufek
+Jaký učitel hodnotil písemky podle tzv. "kola štěstí"?  (stačí příjmení) /Mareš
 Co znamená slovo "svišť" u pana učitele Nymše?(v oboru POS) /switch
 Doplň větu z virálního videa - Nebudu to dělat, ............. na planetě. /ty jsi ten největší blbec
 Kdy vznikla naše škola? (Nápověda:1935-1965) /1952
 Kolik let trvá učební obor „Elektrikář“? /3
 Kdo je zřizovatelem školy? /Královéhradecký kraj
 Kolik pracovišť škola dnes má? /4
-Kolik lidí t naší třídy nosí pravidelně brýle? /8
+Kolik lidí z naší třídy nosí pravidelně brýle? /8
 Kolik je ve třídě Matějů? /3
 Kolik je ve třídě lidí? /29
 Jak dlouho trvá učební obor „Nástrojař“ na SPŠ Trutnov? /3
@@ -20,6 +20,6 @@ Je studium na SPŠ Trutnov zdarma? /Ano
 Jak dlouhé je studium maturitních oborů? /4 roky
 Získají učební obory výuční list? /Ano
 Pořádá škola exkurze do firem? /Ano
-Jaký učitel učí naší třídu aplikační software? /Jakub Lattenberg
-Jaký učitel učí naší třídu občanskou nauku? /Radana Návratová
-Jaký učitel učí naší třídu tělesnou výchovu? /Martin Kádrle
+Jaký učitel učí naší třídu aplikační software?  (stačí příjmení) /Lattenberg
+Jaký učitel učí naší třídu občanskou nauku?  (stačí příjmení) /Návratová
+Jaký učitel učí naší třídu tělesnou výchovu?  (stačí příjmení) /Kádrle
