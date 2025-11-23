@@ -12,7 +12,7 @@
     </div>
 }
 
-<div>
+<div class="sloupec">
     <label for="playerId_display">Tvé ID:</label>
     <input type="number"
            id="playerId_display"
@@ -20,7 +20,7 @@
            value="@ViewBag.UserId"
            readonly
            disabled
-           style="margin-bottom:1rem; width:100%;" />
+           style="margin-bottom:1rem; width:220px;" />
 
     <h3>Vytvořit novou hru:</h3>
     <div style="display:flex; flex-direction:column; gap:1rem; width:220px; margin-bottom:2rem;">
@@ -28,18 +28,28 @@
         <a href="/Games/OneVOne?pid=@ViewBag.UserId" class="button">1v1</a>
         <a href="/Games/TwoVTwo?pid=@ViewBag.UserId" class="button">2v2</a>
         <a href="/Games/FullBlockMode?pid=@ViewBag.UserId" class="button">FullBlock</a>
+        <a href="/Games/Duel?pid=@ViewBag.UserId" class="button">🔥 Duel</a>
     </div>
 
     <h3>Nebo se připoj k existující hře:</h3>
     <form method="get" action="/Games/Join" id="joinForm">
         <input type="hidden" name="pid" value="@ViewBag.UserId" />
         <label for="joinGameId">ID hry:</label>
-        <input type="number" id="joinGameId" name="gameId" min="100000" max="999999" style="margin-bottom:0.5rem;" required />
+        <input type="number" id="joinGameId" name="gameId" min="100000" max="999999" style="margin-bottom:0.5rem; width:220px;" required />
         <button id="joinButton" type="submit" class="button-secondary">Připojit se</button>
     </form>
 </div>
 
 <style>
+    .sloupec {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center horizontally */
+        justify-content: center; /* Center vertically */
+        align-content: center;
+    }
+
+
     .button, .button-secondary {
         display: flex;
         align-items: center;

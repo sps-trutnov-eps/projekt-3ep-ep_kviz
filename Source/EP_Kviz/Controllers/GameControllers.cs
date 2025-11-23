@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
+using System.Security.Cryptography;
 
 public class GamesController : Controller
 {
@@ -33,7 +34,12 @@ public class GamesController : Controller
         }
 
         // Pro hru použijeme hashCode userId jako číslo
-        int numericUserId = Math.Abs(userId.GetHashCode());
+        int numericUserId = 0;
+        using (var sha256 = SHA256.Create())
+        {
+            byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(userId));
+            numericUserId = Math.Abs(BitConverter.ToInt32(hashBytes, 0));
+        }
         ViewBag.UserId = numericUserId;
         
         return View();
@@ -97,6 +103,7 @@ public class GamesController : Controller
     }
 
     public IActionResult FullBlockMode(int pid)
+    public IActionResult Duel(int pid)
     {
         int gameId = GenerateRandomGameId();
 
@@ -112,6 +119,12 @@ public class GamesController : Controller
 
         // Instead of directly assigning to CanStart, use a method or logic to handle its state
         game.EnsurePlayer(pid); // Call a method to ensure the player is added
+
+            Mode = "Duel",
+            Players = new List<int> { pid },
+            Scores = new Dictionary<int, int> { { pid, 0 } },
+            CreatedAt = DateTime.Now
+        };
 
         _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
         return RedirectToAction("Play", new { gameId = gameId, pid = pid });
@@ -439,8 +452,18 @@ public class GamesController : Controller
         }
         else
         {
-            cell.OwnerPlayerId = -1; // černá
-            cell.IsAnswered = false;  // lze znovu odpovídat
+            // V Duel módu končí hra při špatné odpovědi
+            if (game.Mode == "Duel")
+            {
+                cell.OwnerPlayerId = -1;
+                cell.IsAnswered = false;
+                game.SetDuelWinner(pid); // Vyhrává druhý hráč
+            }
+            else
+            {
+                cell.OwnerPlayerId = -1; // černá
+                cell.IsAnswered = false;  // lze znovu odpovídat
+            }
         }
 
 
