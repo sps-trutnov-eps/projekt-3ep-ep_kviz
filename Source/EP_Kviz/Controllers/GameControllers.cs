@@ -96,6 +96,23 @@ public class GamesController : Controller
         return RedirectToAction("Play", new { gameId = gameId, pid = pid });
     }
 
+    public IActionResult Duel(int pid)
+    {
+        int gameId = GenerateRandomGameId();
+
+        var game = new GameSession
+        {
+            GameId = gameId,
+            Mode = "Duel",
+            Players = new List<int> { pid },
+            Scores = new Dictionary<int, int> { { pid, 0 } },
+            CreatedAt = DateTime.Now
+        };
+
+        _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
+        return RedirectToAction("Play", new { gameId = gameId, pid = pid });
+    }
+
     public IActionResult Join(int gameId, int pid)
     {
         if (_cache.TryGetValue($"game_{gameId}", out GameSession game))
@@ -333,8 +350,18 @@ public class GamesController : Controller
         }
         else
         {
-            cell.OwnerPlayerId = -1; // černá
-            cell.IsAnswered = false;  // lze znovu odpovídat
+            // V Duel módu končí hra při špatné odpovědi
+            if (game.Mode == "Duel")
+            {
+                cell.OwnerPlayerId = -1;
+                cell.IsAnswered = false;
+                game.SetDuelWinner(pid); // Vyhrává druhý hráč
+            }
+            else
+            {
+                cell.OwnerPlayerId = -1; // černá
+                cell.IsAnswered = false;  // lze znovu odpovídat
+            }
         }
 
         game.PendingQuestion = null;

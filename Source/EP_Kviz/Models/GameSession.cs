@@ -43,12 +43,14 @@ namespace EP_Kviz.Models
         public const int PLAYERS_PROCVICENI = 1;
         public const int PLAYERS_1V1 = 2;
         public const int PLAYERS_2V2 = 4;
+        public const int PLAYERS_DUEL = 2;
 
         public int RequiredPlayers => Mode switch
         {
             "Procvičení" => PLAYERS_PROCVICENI,
             "1v1" => PLAYERS_1V1,
             "2v2" => PLAYERS_2V2,
+            "Duel" => PLAYERS_DUEL,
             _ => 2 // výchozí hodnota
         };
 
@@ -64,6 +66,7 @@ namespace EP_Kviz.Models
             "Procvičení" => Players.Count >= PLAYERS_PROCVICENI,
             "1v1" => Players.Count >= PLAYERS_1V1,
             "2v2" => Players.Count >= PLAYERS_2V2,
+            "Duel" => Players.Count >= PLAYERS_DUEL,
             _ => false
         };
 
@@ -72,6 +75,7 @@ namespace EP_Kviz.Models
         {
             if (!CanStart) return false;
             if (Mode == "Procvičení") return true; // v procvičení může hrát vždy
+            if (Mode == "Duel") return true; // v duelu mohou oba hráči klikat kdykoliv
             return CurrentTurnPlayerId == playerId;
         }
 
@@ -79,6 +83,7 @@ namespace EP_Kviz.Models
         public int GetNextPlayer(int currentPlayerId)
         {
             if (Mode == "Procvičení") return currentPlayerId; // stejný hráč pokračuje
+            if (Mode == "Duel") return currentPlayerId; // v duelu se netřídá, oba mohou klikat
 
             if (Mode == "2v2")
             {
@@ -133,6 +138,19 @@ namespace EP_Kviz.Models
                 CheckTeamWin("blue", topSide, bottomSide, leftSide, rightSide);
                 CheckTeamWin("orange", topSide, bottomSide, leftSide, rightSide);
             }
+            else if (Mode == "Duel")
+            {
+                // V Duel módu se kontroluje pouze spojení stran (konec při špatné odpovědi je v controlleru)
+                foreach (var playerId in Players)
+                {
+                    if (CheckPlayerWin(playerId, topSide, bottomSide, leftSide, rightSide))
+                    {
+                        WinnerId = playerId;
+                        IsActive = false;
+                        return;
+                    }
+                }
+            }
             else
             {
                 // Kontrola pro jednotlivé hráče (1v1, Procvičení)
@@ -146,6 +164,16 @@ namespace EP_Kviz.Models
                     }
                 }
             }
+        }
+
+        // Nastavení vítěze v Duel módu při špatné odpovědi
+        public void SetDuelWinner(int losingPlayerId)
+        {
+            if (Mode != "Duel") return;
+            
+            // Vítězem je druhý hráč (ten, kdo neprohrál)
+            WinnerId = Players.First(p => p != losingPlayerId);
+            IsActive = false;
         }
 
         private bool CheckPlayerWin(int playerId, int[] top, int[] bottom, int[] left, int[] right)
