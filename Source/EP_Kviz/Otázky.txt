@@ -15,9 +15,9 @@ Kolik pracovišť škola dnes má? /4
 Kolik lidí z naší třídy nosí pravidelně brýle? /8
 Kolik je ve třídě Matějů? /3
 Kolik je ve třídě lidí? /29
-Jak dlouho trvá učební obor „Nástrojař“ na SPŠ Trutnov? /3
+Kolik let trvá učební obor „Nástrojař“ na SPŠ Trutnov? /3
 Je studium na SPŠ Trutnov zdarma? /Ano
-Kolik roků trvá studium maturitních oborů? /4
+Kolik let trvá studium maturitních oborů? /4
 Získají učební obory výuční list? /Ano
 Pořádá škola exkurze do firem? /Ano
 Jaký učitel učí naší třídu aplikační software?  (stačí příjmení) /Lattenberg
