@@ -103,7 +103,6 @@ public class GamesController : Controller
     }
 
     public IActionResult FullBlockMode(int pid)
-    public IActionResult Duel(int pid)
     {
         int gameId = GenerateRandomGameId();
 
@@ -113,13 +112,20 @@ public class GamesController : Controller
             Mode = "FullBlock",
             Players = new List<int> { pid },
             Scores = new Dictionary<int, int> { { pid, 0 } },
-            CreatedAt = DateTime.Now,
-            PlayerTeams = new Dictionary<int, string>() // Ensure PlayerTeams is initialized
+            CreatedAt = DateTime.Now
         };
 
-        // Instead of directly assigning to CanStart, use a method or logic to handle its state
-        game.EnsurePlayer(pid); // Call a method to ensure the player is added
+        _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
+        return RedirectToAction("Play", new { gameId = gameId, pid = pid });
+    }
 
+    public IActionResult Duel(int pid)
+    {
+        int gameId = GenerateRandomGameId();
+
+        var game = new GameSession
+        {
+            GameId = gameId,
             Mode = "Duel",
             Players = new List<int> { pid },
             Scores = new Dictionary<int, int> { { pid, 0 } },
