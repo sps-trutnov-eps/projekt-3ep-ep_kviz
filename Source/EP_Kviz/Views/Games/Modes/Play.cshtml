@@ -209,7 +209,7 @@
         const ans = answerInput.value || '';
         fetch(`/Games/SubmitAnswer?gameId=${gameIdElem.textContent}&pid=${myId}&cellId=${localPending.cellId}&answer=${encodeURIComponent(ans)}`, { method: 'POST' })
             .then(r => r.json())
-            .then(json => {
+            .then json => {
                 if (json.error) { alert(json.error); return; }
                 
                 // Kontrola výhry
@@ -351,7 +351,10 @@
         
         // Počkáme 500ms, aby se grid stihl aktualizovat
         setTimeout(() => {
-            if (state.mode === "2v2" && state.winnerTeam) {
+            if (state.isDraw) {
+                // Remíza
+                winnerText.innerHTML = '<span style="color: #ffff00; font-weight: bold;">REMÍZA!</span><br><span style="font-size: 1.2rem;">Oba hráči mají stejný počet políček.</span>';
+            } else if (state.mode === "2v2" && state.winnerTeam) {
                 const teamName = state.winnerTeam === "blue" ? "MODRÝ TÝM" : "ORANŽOVÝ TÝM";
                 const teamColor = state.winnerTeam === "blue" ? "#00aaff" : "#ff8c00";
                 winnerText.innerHTML = `<span style="color: ${teamColor}; font-weight: bold;">${teamName}</span> vyhrál!`;

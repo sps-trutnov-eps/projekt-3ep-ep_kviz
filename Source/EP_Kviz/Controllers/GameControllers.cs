@@ -325,7 +325,8 @@ public class GamesController : Controller
                 scores = game.Scores ?? new Dictionary<int, int>(),
                 isGameOver = game.IsGameOver,
                 winnerId = game.WinnerId,
-                winnerTeam = game.WinnerTeam
+                winnerTeam = game.WinnerTeam,
+                isDraw = game.IsDraw
             });
         }
         return Json(new { error = "Game not found" });
@@ -492,7 +493,8 @@ public class GamesController : Controller
             team = game.Mode == "2v2" ? game.GetPlayerTeam(cell.OwnerPlayerId ?? -1) : null,
             isGameOver = game.IsGameOver,
             winnerId = game.WinnerId,
-            winnerTeam = game.WinnerTeam
+            winnerTeam = game.WinnerTeam,
+            isDraw = game.IsDraw
         });
     }
 
