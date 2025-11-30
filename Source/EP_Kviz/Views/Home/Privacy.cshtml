@@ -1,12 +1,83 @@
 ﻿@{
-    ViewData["Title"] = "Privacy Policy";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Ochrana osobních údajů";
+    Layout = null;
 }
 
+<!doctype html>
+<html lang="cs">
 <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
     <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            min-height: 100%;
+            width: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            font-family: "Orbitron", sans-serif;
+            background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+            color: #fff;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            text-shadow: 0 0 12px rgba(0,255,255,0.6);
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            color: #00f2ff;
+            text-shadow: 0 0 8px rgba(0,242,255,0.5);
+        }
+
+        h3 {
+            font-size: 1.3rem;
+            margin-top: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: #00d4ff;
+        }
+
+        p, li {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            color: #e0e7ff;
+        }
+
+        ul {
+            margin-left: 2rem;
+            margin-bottom: 1rem;
+        }
+
         .home-button {
-            position: absolute;
+            position: fixed;
             top: 24px;
             right: 32px;
             padding: 0.7rem 1.4rem;
@@ -21,18 +92,60 @@
             z-index: 10;
         }
 
-            .home-button:hover {
-                transform: scale(1.07);
-                box-shadow: 0 0 18px rgba(0,242,255,0.8);
-            }
+        .home-button:hover {
+            transform: scale(1.07);
+            box-shadow: 0 0 18px rgba(0,242,255,0.8);
+        }
+
+        strong {
+            color: #00f2ff;
+            font-weight: 700;
+        }
     </style>
 </head>
-
 <body>
-<h1>@ViewData["Title"]</h1>
     <a href="/Home/Index" class="home-button">Zpět</a>
 
-<p>Use this page to detail your site's privacy policy.</p>
-</body>
+    <div class="container">
+        <h1>🔒 Ochrana osobních údajů</h1>
 
-<!-- Tahle stránka je jenom na testování bude se moct smazat, nezapomeň smazat i tlačítko v index -->
+        <h2>📋 O projektu</h2>
+        <p>EPKvíz je <strong>výhradně školní projekt</strong> vytvořený pro vzdělávací účely studentů SPŠ Trutnov. Aplikace slouží pouze k demonstraci programovacích dovedností a herních mechanik.</p>
+
+        <h2>🎮 Jaká data sbíráme</h2>
+        <p>Pro základní fungování herních mechanik sbíráme pouze:</p>
+        <ul>
+            <li><strong>Uživatelské jméno</strong> - pro přihlášení a identifikaci v rámci hry</li>
+            <li><strong>Heslo</strong> - pro autentizaci účtu (ukládáno v hashované formě)</li>
+            <li><strong>Herní statistiky</strong> - pro sledování průběhu her a skóre</li>
+        </ul>
+
+        <h2>🔐 Jak data používáme</h2>
+        <p>Data jsou používána <strong>výhradně</strong> pro:</p>
+        <ul>
+            <li>Přihlášení do aplikace</li>
+            <li>Identifikaci hráčů v herních lobbies</li>
+            <li>Sledování průběhu her (skóre, odpovědi)</li>
+            <li>Základní herní mechaniky</li>
+        </ul>
+
+        <h2>🛡️ Bezpečnost</h2>
+        <p>I přes všechno úsilí je toto <strong>školní projekt</strong> a nikoliv komerční aplikace. Proto:</p>
+        <ul>
+            <li>Bezpečnostní opatření nejsou na profesionální úrovni</li>
+            <li>Hesla jsou hashována, ale databáze může být zranitelná</li>
+            <li>Používejte pouze unikátní heslo vytvořené pro tuto aplikaci</li>
+            <li>Data mohou být teoreticky přístupná administrátorům</li>
+        </ul>
+
+        <h2>📚 Školní projekt</h2>
+        <ul>
+            <li><strong>Autoři:</strong> Matyáš Hudeček, Vojtěch Novák, Ondřej Imlauf</li>
+            <li><strong>Škola:</strong> Střední průmyslová škola Trutnov</li>
+            <li><strong>Účel:</strong> Vzdělávací projekt pro předmět programování</li>
+            <li><strong>Licence:</strong> MIT License (viz LICENSE.md)</li>
+        </ul>
+
+    </div>
+</body>
+</html>
