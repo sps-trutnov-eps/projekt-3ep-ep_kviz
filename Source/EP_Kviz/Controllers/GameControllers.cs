@@ -159,16 +159,6 @@ public class GamesController : Controller
                     string team = game.Players.Count <= 2 ? "blue" : "orange";
                     game.PlayerTeams[pid] = team;
                 }
-
-                // Pokud je teď dost hráčů, inicializuj grid
-                if (game.Players.Count == game.RequiredPlayers)
-                {
-                    game.CheckWinner();
-                    if (game.Grid == null || game.Grid.Count == 0)
-                    {
-                        EnsureGridInitialized(game);
-                    }
-                }
             }
 
             if (game.Scores == null)
@@ -176,6 +166,12 @@ public class GamesController : Controller
 
             if (!game.Scores.ContainsKey(pid))
                 game.Scores[pid] = 0;
+
+            // Pokud je teď dost hráčů a grid není inicializován, inicializuj
+            if (game.Players.Count == game.RequiredPlayers && (game.Grid == null || game.Grid.Count == 0))
+            {
+                EnsureGridInitialized(game);
+            }
 
             _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
 

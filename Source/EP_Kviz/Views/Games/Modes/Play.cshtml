@@ -206,25 +206,25 @@
     
     function submitAnswer() {
         if (!localPending) return;
-        const ans = answerInput.value || '';
+   const ans = answerInput.value || '';
         fetch(`/Games/SubmitAnswer?gameId=${gameIdElem.textContent}&pid=${myId}&cellId=${localPending.cellId}&answer=${encodeURIComponent(ans)}`, { method: 'POST' })
-            .then(r => r.json())
-            .then json => {
+    .then(r => r.json())
+            .then(json => {
                 if (json.error) { alert(json.error); return; }
-                
-                // Kontrola výhry
-                if (json.isGameOver) {
-                    updateGridFromState(json);
-                    localPending = null;
-                    questionBox.style.display = 'none';
-                    return;
-                }
-                
-                updateGridFromState(json);
+       
+       // Kontrola výhry
+    if (json.isGameOver) {
+         updateGridFromState(json);
+        localPending = null;
+          questionBox.style.display = 'none';
+         return;
+        }
+
+        updateGridFromState(json);
                 localPending = null;
                 questionBox.style.display = 'none';
             })
-            .catch(err => console.error(err));
+  .catch(err => console.error(err));
     }
 
     function updateGridFromState(res) {
