@@ -15,11 +15,11 @@ Kolik pracovišť škola dnes má? /4
 Kolik lidí z naší třídy nosí pravidelně brýle? /8
 Kolik je ve třídě Matějů? /3
 Kolik je ve třídě lidí? /29
-Jak dlouho trvá učební obor „Nástrojař“ na SPŠ Trutnov? /3
-Je studium na SPŠ Trutnov zdarma? (Ano - Ne) /Ano
-Jak dlouhé je studium maturitních oborů? /4 roky
-Získají učební obory výuční list? (Ano - Ne) /Ano
-Pořádá škola exkurze do firem? (Ano - Ne) /Ano
+Kolik let trvá učební obor „Nástrojař“ na SPŠ Trutnov? /3
+Je studium na SPŠ Trutnov zdarma? /Ano
+Kolik let trvá studium maturitních oborů? /4
+Získají učební obory výuční list? /Ano
+Pořádá škola exkurze do firem? /Ano
 Jaký učitel učí naší třídu aplikační software?  (stačí příjmení) /Lattenberg
 Jaký učitel učí naší třídu občanskou nauku?  (stačí příjmení) /Návratová
 Jaký učitel učí naší třídu tělesnou výchovu?  (stačí příjmení) /Kádrle
@@ -32,3 +32,8 @@ Má škola vlastní dílny pro praxi? (Ano - Ne) /Ano
 Jaký je hlavní cizí jazyk ve škole? /Angličtina
 Který jazyk se ve škole učí jako druhý cizí? /Němčina
 Je součástí výuky práce s CNC stroji? (Ano - Ne) /Ano
+Jak se jmenuje ředitel SPŠ Trutnov (příjmením) /Sauer
+Kolik oborů nabízí SPŠ Trutnov /6
+Kolik má škola zaměstnanců (nepočítaje uklizečky) /70
+Kolik má škola zástupců ředitele /4
+Jak se jmenuje ulice, ve které sídlí vedení školy /Školní

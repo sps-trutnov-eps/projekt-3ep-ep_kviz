@@ -4,6 +4,7 @@ using EP_Kviz.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EP_Kviz.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251130190545_StatistikyHrani")]
+    partial class StatistikyHrani
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,7 +100,7 @@ namespace EP_Kviz.Migrations
                         {
                             Id = "1a2b3c4d-5e6f-7g8h-9i0j-1k2l3m4n5o6p",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "d0b9472d-f30e-4809-b951-f392d3e0ffec",
+                            ConcurrencyStamp = "9f2cabdd-ab3b-42c9-a9e5-224a9f6f206a",
                             Email = "test@epkviz.cz",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
@@ -107,7 +110,7 @@ namespace EP_Kviz.Migrations
                             PhoneNumberConfirmed = false,
                             PocetOdehranychHer = 0,
                             PocetVyhranychHer = 0,
-                            SecurityStamp = "b1eb1c93-c613-4b1f-86f3-a1820441444d",
+                            SecurityStamp = "0c9a6fcd-4486-493e-b202-ddb30a423cb7",
                             TwoFactorEnabled = false,
                             UserName = "test@epkviz.cz"
                         });

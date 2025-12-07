@@ -38,7 +38,8 @@ namespace EP_Kviz.Models
         // Výhra
         public int? WinnerId { get; set; } = null;
         public string? WinnerTeam { get; set; } = null;
-        public bool IsGameOver => WinnerId.HasValue || !string.IsNullOrEmpty(WinnerTeam);
+        public bool IsDraw { get; set; } = false; // Přidáno pro remízu
+        public bool IsGameOver => WinnerId.HasValue || !string.IsNullOrEmpty(WinnerTeam) || IsDraw;
 
         // Přidáme nové vlastnosti pro týmy
         public const int PLAYERS_PROCVICENI = 1;
@@ -86,7 +87,7 @@ namespace EP_Kviz.Models
         public int GetNextPlayer(int currentPlayerId)
         {
             if (Mode == "Procvičení") return currentPlayerId; // stejný hráč pokračuje
-            if (Mode == "Duel") return currentPlayerId; // v duelu se netřídá, oba mohou klikat
+            if (Mode == "Duel") return currentPlayerId; // v duelu se netřídí, oba mohou klikat
 
             if (Mode == "2v2")
             {
@@ -140,10 +141,16 @@ namespace EP_Kviz.Models
                 // Kontrola pro týmy
                 CheckTeamWin("blue", topSide, bottomSide, leftSide, rightSide);
                 CheckTeamWin("orange", topSide, bottomSide, leftSide, rightSide);
+                
+                // Pokud je grid plný a nikdo nevyhrál, vyhrává tým s více políčky
+                if (!IsGameOver && IsGridFull())
+                {
+                    CheckWinnerByMostCells();
+                }
             }
             else if (Mode == "Duel")
             {
-                // V Duel módu se kontroluje pouze spojení stran (konec při špatné odpovědi je v controlleru)
+                // V Duel módu se kontroluje spojení stran
                 foreach (var playerId in Players)
                 {
                     if (CheckPlayerWin(playerId, topSide, bottomSide, leftSide, rightSide))
@@ -152,6 +159,22 @@ namespace EP_Kviz.Models
                         IsActive = false;
                         return;
                     }
+                }
+                
+                // Pokud je grid plný a nikdo nevyhrál spojením, je to remíza
+                if (IsGridFull())
+                {
+                    IsDraw = true;
+                    IsActive = false;
+                    return;
+                }
+            }
+            else if (Mode == "FullBlock")
+            {
+                // V FullBlock módu jde o nejvíce políček
+                if (IsGridFull())
+                {
+                    CheckWinnerByMostCells();
                 }
             }
             else
@@ -165,6 +188,68 @@ namespace EP_Kviz.Models
                         IsActive = false;
                         return;
                     }
+                }
+                
+                // Pokud je grid plný a nikdo nevyhrál, vyhrává hráč s více políčky
+                if (!IsGameOver && IsGridFull())
+                {
+                    CheckWinnerByMostCells();
+                }
+            }
+        }
+
+        // Kontrola, zda je grid plný (všechna políčka zodpovězena)
+        private bool IsGridFull()
+        {
+            return Grid.All(c => c.IsAnswered && c.OwnerPlayerId.HasValue && c.OwnerPlayerId > 0);
+        }
+
+        // Určení vítěze podle počtu políček
+        private void CheckWinnerByMostCells()
+        {
+            if (Mode == "2v2")
+            {
+                // Spočítání políček pro každý tým
+                var blueCount = Grid.Count(c => c.OwnerPlayerId.HasValue && GetPlayerTeam(c.OwnerPlayerId.Value) == "blue");
+                var orangeCount = Grid.Count(c => c.OwnerPlayerId.HasValue && GetPlayerTeam(c.OwnerPlayerId.Value) == "orange");
+
+                if (blueCount > orangeCount)
+                {
+                    WinnerTeam = "blue";
+                    IsActive = false;
+                }
+                else if (orangeCount > blueCount)
+                {
+                    WinnerTeam = "orange";
+                    IsActive = false;
+                }
+                else
+                {
+                    IsDraw = true;
+                    IsActive = false;
+                }
+            }
+            else
+            {
+                // Spočítání políček pro každého hráče
+                var playerCounts = Players.ToDictionary(
+                    p => p,
+                    p => Grid.Count(c => c.OwnerPlayerId == p)
+                );
+
+                var maxCount = playerCounts.Values.Max();
+                var winners = playerCounts.Where(kvp => kvp.Value == maxCount).Select(kvp => kvp.Key).ToList();
+
+                if (winners.Count == 1)
+                {
+                    WinnerId = winners[0];
+                    IsActive = false;
+                }
+                else
+                {
+                    // Remíza - více hráčů má stejný počet políček
+                    IsDraw = true;
+                    IsActive = false;
                 }
             }
         }

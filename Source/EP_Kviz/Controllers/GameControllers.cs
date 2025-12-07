@@ -103,7 +103,6 @@ public class GamesController : Controller
     }
 
     public IActionResult FullBlockMode(int pid)
-    public IActionResult Duel(int pid)
     {
         int gameId = GenerateRandomGameId();
 
@@ -113,13 +112,20 @@ public class GamesController : Controller
             Mode = "FullBlock",
             Players = new List<int> { pid },
             Scores = new Dictionary<int, int> { { pid, 0 } },
-            CreatedAt = DateTime.Now,
-            PlayerTeams = new Dictionary<int, string>() // Ensure PlayerTeams is initialized
+            CreatedAt = DateTime.Now
         };
 
-        // Instead of directly assigning to CanStart, use a method or logic to handle its state
-        game.EnsurePlayer(pid); // Call a method to ensure the player is added
+        _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
+        return RedirectToAction("Play", new { gameId = gameId, pid = pid });
+    }
 
+    public IActionResult Duel(int pid)
+    {
+        int gameId = GenerateRandomGameId();
+
+        var game = new GameSession
+        {
+            GameId = gameId,
             Mode = "Duel",
             Players = new List<int> { pid },
             Scores = new Dictionary<int, int> { { pid, 0 } },
@@ -153,16 +159,6 @@ public class GamesController : Controller
                     string team = game.Players.Count <= 2 ? "blue" : "orange";
                     game.PlayerTeams[pid] = team;
                 }
-
-                // Pokud je teď dost hráčů, inicializuj grid
-                if (game.Players.Count == game.RequiredPlayers)
-                {
-                    game.CheckWinner();
-                    if (game.Grid == null || game.Grid.Count == 0)
-                    {
-                        EnsureGridInitialized(game);
-                    }
-                }
             }
 
             if (game.Scores == null)
@@ -170,6 +166,12 @@ public class GamesController : Controller
 
             if (!game.Scores.ContainsKey(pid))
                 game.Scores[pid] = 0;
+
+            // Pokud je teď dost hráčů a grid není inicializován, inicializuj
+            if (game.Players.Count == game.RequiredPlayers && (game.Grid == null || game.Grid.Count == 0))
+            {
+                EnsureGridInitialized(game);
+            }
 
             _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
 
@@ -319,7 +321,8 @@ public class GamesController : Controller
                 scores = game.Scores ?? new Dictionary<int, int>(),
                 isGameOver = game.IsGameOver,
                 winnerId = game.WinnerId,
-                winnerTeam = game.WinnerTeam
+                winnerTeam = game.WinnerTeam,
+                isDraw = game.IsDraw
             });
         }
         return Json(new { error = "Game not found" });
@@ -486,7 +489,8 @@ public class GamesController : Controller
             team = game.Mode == "2v2" ? game.GetPlayerTeam(cell.OwnerPlayerId ?? -1) : null,
             isGameOver = game.IsGameOver,
             winnerId = game.WinnerId,
-            winnerTeam = game.WinnerTeam
+            winnerTeam = game.WinnerTeam,
+            isDraw = game.IsDraw
         });
     }
 
