@@ -10,16 +10,22 @@ using System.Linq;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
 
 public class GamesController : Controller
 {
     private readonly IMemoryCache _cache;
+    private readonly AppDbContext _context;
+    private readonly UserManager<UzivateleModel> _userManager;
     private static readonly object _questionsLock = new object();
     private static List<(string Q, string A)> _questionsCache = null;
 
-    public GamesController(IMemoryCache cache)
+    public GamesController(IMemoryCache cache, AppDbContext context, UserManager<UzivateleModel> userManager)
     {
         _cache = cache;
+        _context = context;
+        _userManager = userManager;
     }
 
     [Authorize]
@@ -45,7 +51,7 @@ public class GamesController : Controller
         return View();
     }
 
-    public IActionResult OneVOne(int pid)
+    public async Task<IActionResult> OneVOne(int pid)
     {
         int gameId = GenerateRandomGameId();
 
@@ -62,7 +68,7 @@ public class GamesController : Controller
         return RedirectToAction("Play", new { gameId = gameId, pid = pid });
     }
 
-    public IActionResult TwoVTwo(int pid)
+    public async Task<IActionResult> TwoVTwo(int pid)
     {
         int gameId = GenerateRandomGameId();
 
@@ -82,7 +88,7 @@ public class GamesController : Controller
         return RedirectToAction("Play", new { gameId = gameId, pid = pid });
     }
 
-    public IActionResult Procviceni(int pid)
+    public async Task<IActionResult> Procviceni(int pid)
     {
         int gameId = GenerateRandomGameId();
 
@@ -96,13 +102,13 @@ public class GamesController : Controller
         };
 
         // Pro procvičení ihned inicializujeme grid a hráč může začít
-        EnsureGridInitialized(game);
+        await EnsureGridInitializedAsync(game);
         
         _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
         return RedirectToAction("Play", new { gameId = gameId, pid = pid });
     }
 
-    public IActionResult FullBlockMode(int pid)
+    public async Task<IActionResult> FullBlockMode(int pid)
     {
         int gameId = GenerateRandomGameId();
 
@@ -119,7 +125,7 @@ public class GamesController : Controller
         return RedirectToAction("Play", new { gameId = gameId, pid = pid });
     }
 
-    public IActionResult Duel(int pid)
+    public async Task<IActionResult> Duel(int pid)
     {
         int gameId = GenerateRandomGameId();
 
@@ -137,8 +143,7 @@ public class GamesController : Controller
     }
 
 
-
-    public IActionResult Join(int gameId, int pid)
+    public async Task<IActionResult> Join(int gameId, int pid)
     {
         if (_cache.TryGetValue($"game_{gameId}", out GameSession game))
         {
@@ -170,7 +175,7 @@ public class GamesController : Controller
             // Pokud je teď dost hráčů a grid není inicializován, inicializuj
             if (game.Players.Count == game.RequiredPlayers && (game.Grid == null || game.Grid.Count == 0))
             {
-                EnsureGridInitialized(game);
+                await EnsureGridInitializedAsync(game);
             }
 
             _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
@@ -185,7 +190,7 @@ public class GamesController : Controller
     }
 
 
-    private void EnsureGridInitialized(GameSession game)
+    private async Task EnsureGridInitializedAsync(GameSession game)
     {
         if (game.Grid?.Count == 25) return;
         if (!game.CanStart) return; // Explicitly disambiguate the property
@@ -217,6 +222,32 @@ public class GamesController : Controller
         }
 
         game.PendingQuestion = null;
+
+        // Pokud hra není režim Procvičení, zvýšíme počet odehraných her pro všechny hráče v lobby
+        if (game.Mode != "Procvičení")
+        {
+            // Pro každý pid v game.Players najdeme odpovídajícího uživatele vypočtením stejného numerického ID
+            var users = _userManager.Users.ToList();
+            foreach (var pid in game.Players.Distinct())
+            {
+                foreach (var user in users)
+                {
+                    int numericId;
+                    using (var sha256 = SHA256.Create())
+                    {
+                        var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(user.Id));
+                        numericId = Math.Abs(BitConverter.ToInt32(hashBytes, 0));
+                    }
+
+                    if (numericId == pid)
+                    {
+                        user.PocetOdehranychHer++;
+                        await _userManager.UpdateAsync(user);
+                        break; // najdeme jen jednoho uživatele
+                    }
+                }
+            }
+        }
     }
 
 
@@ -431,7 +462,7 @@ public class GamesController : Controller
                         p => game.Grid.Count(c => c.OwnerPlayerId == p)
                     );
 
-                    // Najděte hráče s nejvyšším počtem polí
+                    // Najděte hráče s nejvyším počtem polí
                     var max = playerCounts.Values.Max();
                     var winners = playerCounts.Where(kv => kv.Value == max).Select(kv => kv.Key).ToList();
 
