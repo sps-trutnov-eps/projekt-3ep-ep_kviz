@@ -1,0 +1,59 @@
+@model List<EP_Kviz.Models.UzivateleModel>
+@{
+ ViewData["Title"] = "Tabulka skóre";
+ Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div style="width:100%; display:flex; justify-content:center; padding:2rem1rem;">
+ <div style="max-width:820px; width:100%; background: rgba(255,255,255,0.03); border-radius:12px; padding:1.25rem; box-shadow:08px30px rgba(0,0,0,0.6);">
+ <h1 style="margin-bottom:0.75rem; font-size:1.8rem;">Tabulka skóre - Top5</h1>
+ <p style="color:#bfcfe2; margin-bottom:1rem;">Nejlepší hráèi podle poètu výher</p>
+
+ <div style="overflow-x:auto;">
+ <table style="width:100%; border-collapse:collapse; table-layout:auto;">
+ <thead>
+ <tr style="background:linear-gradient(90deg,#0066cc,#0099ff); color:white; text-align:left;">
+ <th style="padding:12px16px; width:48px;">#</th>
+ <th style="padding:12px16px;">Uživatel</th>
+ <th style="padding:12px16px; width:160px;">Poèet výher</th>
+ <th style="padding:12px16px; width:200px;">Poèet odehraných her</th>
+ </tr>
+ </thead>
+ <tbody>
+ @for (int i =0; i < Model.Count; i++)
+ {
+ var rowBg = i %2 ==0 ? "rgba(255,255,255,0.02)" : "transparent";
+ <tr style="background:@rowBg;">
+ <td style="padding:10px16px; font-weight:700;">@(i+1)</td>
+ <td style="padding:10px16px; color:#e6f7ff;">@Model[i].UserName</td>
+ <td style="padding:10px16px;">@Model[i].PocetVyhranychHer</td>
+ <td style="padding:10px16px;">@Model[i].PocetOdehranychHer</td>
+ </tr>
+ }
+ </tbody>
+ </table>
+ </div>
+
+ <div style="display:flex; justify-content:flex-end; margin-top:1rem;">
+ <a href="/Home/Index" class="score-back-button">Zpìt</a>
+ </div>
+ </div>
+</div>
+
+<style>
+ .score-back-button {
+ display:inline-block;
+ padding:0.6rem1rem;
+ border-radius:8px;
+ background:linear-gradient(180deg,#00f2ff,#0088ff);
+ color:white;
+ text-decoration:none;
+ font-weight:700;
+ box-shadow:06px18px rgba(0,136,255,0.25);
+ }
+
+ @media (max-width:480px) {
+ h1 { font-size:1.4rem; }
+ .score-back-button { padding:0.5rem0.8rem; }
+ }
+</style>
