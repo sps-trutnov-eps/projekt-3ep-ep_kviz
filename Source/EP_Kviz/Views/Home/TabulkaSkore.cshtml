@@ -3,6 +3,98 @@
  ViewData["Title"] = "Tabulka skóre";
  Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    html, body {
+        min-height: 100%;
+        width: 100%;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+        font-family: "Orbitron", sans-serif;
+        background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+        color: #fff;
+        padding: 2rem;
+    }
+
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: rgba(15, 23, 42, 0.7);
+        border-radius: 12px;
+        box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
+    }
+
+    h1 {
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        text-align: center;
+        text-shadow: 0 0 12px rgba(0,255,255,0.6);
+    }
+
+    h2 {
+        font-size: 1.8rem;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        color: #00f2ff;
+        text-shadow: 0 0 8px rgba(0,242,255,0.5);
+    }
+
+    h3 {
+        font-size: 1.3rem;
+        margin-top: 1.5rem;
+        margin-bottom: 0.8rem;
+        color: #00d4ff;
+    }
+
+    p, li {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+        color: #e0e7ff;
+    }
+
+    ul {
+        margin-left: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .home-button {
+        position: fixed;
+        top: 24px;
+        right: 32px;
+        padding: 0.7rem 1.4rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 700;
+        background: linear-gradient(180deg,#00f2ff,#0088ff);
+        color: #fff;
+        text-decoration: none;
+        box-shadow: 0 0 10px rgba(0,136,255,0.5);
+        transition: transform .15s, box-shadow .15s;
+        z-index: 10;
+    }
+
+        .home-button:hover {
+            transform: scale(1.07);
+            box-shadow: 0 0 18px rgba(0,242,255,0.8);
+        }
+
+    strong {
+        color: #00f2ff;
+        font-weight: 700;
+    }
+</style>
+
+
 
 <h1>Tabulka skóre - Top5</h1>
 
@@ -28,16 +120,4 @@
  </tbody>
 </table>
 
-<a href="/Home/Index" class="button">Zpìt</a>
-
-<style>
- .button {
- display:inline-block;
- padding:0.7rem1.2rem;
- border-radius:8px;
- background:linear-gradient(180deg,#00f2ff,#0088ff);
- color:white;
- text-decoration:none;
- font-weight:700;
- }
-</style>
+<a href="/Home/Index" class="home-button">Zpìt</a>
