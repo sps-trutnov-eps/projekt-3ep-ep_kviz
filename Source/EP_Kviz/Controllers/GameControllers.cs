@@ -421,7 +421,7 @@ public class GamesController : Controller
 
 
     [HttpPost]
-    public IActionResult SubmitAnswer(int gameId, int pid, int cellId, string answer)
+    public async Task<IActionResult> SubmitAnswer(int gameId, int pid, int cellId, string answer)
     {
         if (!_cache.TryGetValue($"game_{gameId}", out GameSession game))
             return Json(new { error = "Game not found" });
@@ -437,6 +437,8 @@ public class GamesController : Controller
 
         if (game.PendingQuestion.AskedByPlayerId != pid)
             return Json(new { error = "Nemůžeš odpovědět na otázku, kterou nepožádal tvůj tah." });
+
+        var wasGameOver = game.IsGameOver;
 
         var correct = NormalizeAnswer(game.PendingQuestion.Answer) == NormalizeAnswer(answer);
 
@@ -462,7 +464,7 @@ public class GamesController : Controller
                         p => game.Grid.Count(c => c.OwnerPlayerId == p)
                     );
 
-                    // Najděte hráče s nejvyším počtem polí
+                    // Najděte hráče s nejvyšším počtem polí
                     var max = playerCounts.Values.Max();
                     var winners = playerCounts.Where(kv => kv.Value == max).Select(kv => kv.Key).ToList();
 
@@ -508,26 +510,82 @@ public class GamesController : Controller
             game.CurrentTurnPlayerId = game.GetNextPlayer(pid);
         }
 
-        _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
-
-        return Json(new
+        // Pokud se hra právě právě skončila a není to procvičení, přičteme vítězství
+        if (!wasGameOver && game.IsGameOver && game.Mode != "Procvičení")
         {
-            ok = true,
-            correct = correct,
-            owner = cell.OwnerPlayerId,
-            cellId = cellId,
-            nextTurn = game.CurrentTurnPlayerId,
-            team = game.Mode == "2v2" ? game.GetPlayerTeam(cell.OwnerPlayerId ?? -1) : null,
-            isGameOver = game.IsGameOver,
-            winnerId = game.WinnerId,
-            winnerTeam = game.WinnerTeam,
-            isDraw = game.IsDraw
-        });
+            // Získáme všechny uživatele jednou
+            var users = _userManager.Users.ToList();
+
+            if (game.WinnerId.HasValue)
+            {
+                int winnerPid = game.WinnerId.Value;
+
+                foreach (var user in users)
+                {
+                    int numericId;
+                    using (var sha256 = SHA256.Create())
+                    {
+                        var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(user.Id));
+                        numericId = Math.Abs(BitConverter.ToInt32(hashBytes, 0));
+                    }
+
+                    if (numericId == winnerPid)
+                    {
+                        user.PocetVyhranychHer++;
+                        await _userManager.UpdateAsync(user);
+                        break;
+                    }
+                }
+            }
+            else if (!string.IsNullOrEmpty(game.WinnerTeam))
+            {
+                var winningTeam = game.WinnerTeam;
+                foreach (var pidInLobby in game.Players.Distinct())
+                {
+                    if (game.GetPlayerTeam(pidInLobby) == winningTeam)
+                    {
+                        foreach (var user in users)
+                        {
+                            int numericId;
+                            using (var sha256 = SHA256.Create())
+                            {
+                                var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(user.Id));
+                                numericId = Math.Abs(BitConverter.ToInt32(hashBytes, 0));
+                            }
+
+                            if (numericId == pidInLobby)
+                            {
+                                user.PocetVyhranychHer++;
+                                await _userManager.UpdateAsync(user);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        // Remíza (IsDraw) -> nic nepřičítáme
     }
 
+    _cache.Set($"game_{gameId}", game, TimeSpan.FromHours(2));
 
-    private int GenerateRandomGameId()
+    return Json(new
     {
-        return Random.Shared.Next(100000, 999999);
-    }
+        ok = true,
+        correct = correct,
+        owner = cell.OwnerPlayerId,
+        cellId = cellId,
+        nextTurn = game.CurrentTurnPlayerId,
+        team = game.Mode == "2v2" ? game.GetPlayerTeam(cell.OwnerPlayerId ?? -1) : null,
+        isGameOver = game.IsGameOver,
+        winnerId = game.WinnerId,
+        winnerTeam = game.WinnerTeam,
+        isDraw = game.IsDraw
+    });
+}
+
+
+private int GenerateRandomGameId()
+{
+ return Random.Shared.Next(100000,999999);
+}
 }
