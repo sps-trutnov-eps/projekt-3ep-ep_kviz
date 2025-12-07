@@ -27,11 +27,8 @@ public class AppDbContext : IdentityDbContext<UzivateleModel>
         var testUser = new UzivateleModel
         {
             Id = testUserId,
-            UserName = "test@epkviz.cz",
-            NormalizedUserName = "TEST@EPKVIZ.CZ",
-            Email = "test@epkviz.cz",
-            NormalizedEmail = "TEST@EPKVIZ.CZ",
-            EmailConfirmed = true,
+            UserName = "test.acc",
+            NormalizedUserName = "TEST.ACC",
             PasswordHash = "AQAAAAIAAYagAAAAEJ8SHVpTXGhxT+OLvVlCJHNvbKGJWQvnNzVaLkOqBfJQXZBGHgBbU0qU9zZ3lA3fxA=="       //heslo je Test@123
         };
 
