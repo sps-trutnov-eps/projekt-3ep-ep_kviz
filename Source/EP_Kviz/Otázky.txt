@@ -37,3 +37,4 @@ Kolik oborů nabízí SPŠ Trutnov /6
 Kolik má škola zaměstnanců (nepočítaje uklizečky) /70
 Kolik má škola zástupců ředitele /4
 Jak se jmenuje ulice, ve které sídlí vedení školy /Školní
+Během tohoto školního roku se na SPŠ Trutnov objevují dny otevřených dveří, během jakých měsíců jsou v tomto roce? (jako spojku použijte "a") /Listopad a Leden
