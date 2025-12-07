@@ -3,72 +3,42 @@
  ViewData["Title"] = "Tabulka skóre";
  Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
+
+<div style="width:100%; display:flex; justify-content:center; padding:2rem0;">
+ <div style="max-width:900px; width:70%;">
+ <h1 style="text-align:center; margin-bottom:1rem;">Tabulka výher</h1>
+
+ <table style="width:100%; max-width:900px; border-collapse: collapse; margin-top:1rem;">
+ <thead>
+ <tr style="background:#0088ff; color:white;">
+ <th style="padding:8px; text-align:left;">#</th>
+ <th style="padding:8px; text-align:left;">Uživatel</th>
+ <th style="padding:8px; text-align:left;">Poèet výher</th>
+ <th style="padding:8px; text-align:left;">Poèet odehraných her</th>
+ </tr>
+ </thead>
+ <tbody>
+ @for (int i =0; i < Model.Count; i++)
+ {
+ <tr style="border-bottom:1px solid #eee; color: #fff;">
+ <td style="padding:8px;">@(i+1)</td>
+ <td style="padding:8px;">@Model[i].UserName</td>
+ <td style="padding:8px;">@Model[i].PocetVyhranychHer</td>
+ <td style="padding:8px;">@Model[i].PocetOdehranychHer</td>
+ </tr>
+ }
+ </tbody>
+ </table>
+
+ <a href="/Home/Index" class="home-button" style="margin-top:1.2rem; display:inline-block;">Zpìt</a>
+ </div>
+</div>
+
 <style>
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-    }
-
-    html, body {
-        min-height: 100%;
-        width: 100%;
-    }
-
-    body {
-        display: flex;
-        flex-direction: column;
-        font-family: "Orbitron", sans-serif;
-        background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
-        color: #fff;
-        padding: 2rem;
-    }
-
-    .container {
-        max-width: 900px;
-        margin: 0 auto;
-        padding: 2rem;
-        background: rgba(15, 23, 42, 0.7);
-        border-radius: 12px;
-        box-shadow: 0 0 20px rgba(0, 242, 255, 0.3);
-    }
-
-    h1 {
-        font-size: 2.5rem;
-        margin-bottom: 2rem;
-        text-align: center;
-        text-shadow: 0 0 12px rgba(0,255,255,0.6);
-    }
-
-    h2 {
-        font-size: 1.8rem;
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        color: #00f2ff;
-        text-shadow: 0 0 8px rgba(0,242,255,0.5);
-    }
-
-    h3 {
-        font-size: 1.3rem;
-        margin-top: 1.5rem;
-        margin-bottom: 0.8rem;
-        color: #00d4ff;
-    }
-
-    p, li {
-        font-size: 1rem;
-        line-height: 1.6;
-        margin-bottom: 1rem;
-        color: #e0e7ff;
-    }
-
-    ul {
-        margin-left: 2rem;
-        margin-bottom: 1rem;
-    }
 
     .home-button {
-        position: fixed;
+        position: absolute;
         top: 24px;
         right: 32px;
         padding: 0.7rem 1.4rem;
@@ -82,42 +52,4 @@
         transition: transform .15s, box-shadow .15s;
         z-index: 10;
     }
-
-        .home-button:hover {
-            transform: scale(1.07);
-            box-shadow: 0 0 18px rgba(0,242,255,0.8);
-        }
-
-    strong {
-        color: #00f2ff;
-        font-weight: 700;
-    }
 </style>
-
-
-
-<h1>Tabulka skóre - Top5</h1>
-
-<table style="width:100%; border-collapse: collapse;">
- <thead>
- <tr style="background:#0088ff; color:white;">
- <th style="padding:8px; text-align:left;">#</th>
- <th style="padding:8px; text-align:left;">Uživatel</th>
- <th style="padding:8px; text-align:left;">Poèet výher</th>
- <th style="padding:8px; text-align:left;">Poèet odehraných her</th>
- </tr>
- </thead>
- <tbody>
- @for (int i =0; i < Model.Count; i++)
- {
- <tr style="border-bottom:1px solid #eee;">
- <td style="padding:8px;">@(i+1)</td>
- <td style="padding:8px;">@Model[i].UserName</td>
- <td style="padding:8px;">@Model[i].PocetVyhranychHer</td>
- <td style="padding:8px;">@Model[i].PocetOdehranychHer</td>
- </tr>
- }
- </tbody>
-</table>
-
-<a href="/Home/Index" class="home-button">Zpìt</a>

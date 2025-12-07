@@ -47,11 +47,12 @@ namespace EP_Kviz.Controllers
             return View();
         }
 
-        // New action: Tabulka skóre - top5 podle PocetVyhranychHer
+        // New action: Tabulka skóre - top5 podle PocetVyhranychHer a PocetOdehranychHer
         public IActionResult TabulkaSkore()
         {
             var top = _context.Users
                 .OrderByDescending(u => u.PocetVyhranychHer)
+                .ThenByDescending(u => u.PocetOdehranychHer)
                 .ThenBy(u => u.UserName)
                 .Take(5)
                 .ToList();
