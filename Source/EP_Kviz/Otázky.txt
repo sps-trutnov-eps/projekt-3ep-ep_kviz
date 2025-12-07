@@ -1,8 +1,8 @@
 Jaký učitel používá zkratku PZ a říká tak žákům?  (stačí příjmení) /Nymš
 Jaký učitel říkal žákům "saláti"?  (stačí příjmení) /Kotek
-Jaký učitel říká panu učitelu Košátkovi "Košťátko"?  (stačí příjmení) /Nymš
+Jaký učitel říká panu učitelovi Košátkovi "Košťátko"?  (stačí příjmení) /Nymš
 Jak během hodiny pan učitel Nymš přeložil slovo "interface" do češtiny? /meziobličej
-Jaký učitel říká "mrkvosoft"?  (stačí příjmení) /Nymš
+Pan učitel Nymš říká "mrkvosoft", co to znamená? /Microsoft
 Jaký učitel vytvořil virální video kde zmiňuje že to nebude dělat?  (stačí příjmení) /Šenkýř
 U jakého učitele jsem při hodinách koukali na idioty za volantem?  (stačí příjmení) /Loufek
 Jaký učitel hodnotil písemky podle tzv. "kola štěstí"?  (stačí příjmení) /Mareš
@@ -28,6 +28,10 @@ Co znamená slovo "vidle" které používá pan učitel Nymš? /windows
 Která třída na budově Školní 101 je PLNĚ zatmavitelná? /T2
 Na jaký film se půjdeme 19.12. dívat do kina? /Neporazitelní
 Jaký učitel měl problém se schody? (stačí příjmení) /Pradáčová
+Má škola vlastní dílny pro praxi? (Ano - Ne) /Ano
+Jaký je hlavní cizí jazyk ve škole? /Angličtina
+Který jazyk se ve škole učí jako druhý cizí? /Němčina
+Je součástí výuky práce s CNC stroji? (Ano - Ne) /Ano
 Jak se jmenuje ředitel SPŠ Trutnov (příjmením) /Sauer
 Kolik oborů nabízí SPŠ Trutnov /6
 Kolik má škola zaměstnanců (nepočítaje uklizečky) /70
