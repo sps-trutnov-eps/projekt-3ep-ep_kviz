@@ -1,6 +1,27 @@
+version: '3.9'
 services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong!Passw0rd
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+
   ep_kviz:
     image: ${DOCKER_REGISTRY-}epkviz
     build:
       context: .
       dockerfile: EP_Kviz/Dockerfile
+    depends_on:
+      - mssql
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=mssql,1433;Database=EPKvizDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True;MultipleActiveResultSets=True;
+    ports:
+      - "7078:7078"
+
+volumes:
+  mssql_data:
