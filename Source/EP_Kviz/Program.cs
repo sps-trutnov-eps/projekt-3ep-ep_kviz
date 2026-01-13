@@ -4,10 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(7078); // Naslouch� na v�ech IP adres�ch na portu 7078
-});
+// Remove hardcoded Kestrel port so hosting profiles can set their own ports (launchSettings, IIS Express, Docker env).
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -29,7 +26,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.SlidingExpiration = true;
     options.Cookie.IsEssential = true;
     options.Cookie.HttpOnly = true;
-    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.None;
     options.LoginPath = "/Uzivatele/Login";
 });
 
@@ -38,11 +35,14 @@ builder.Services.AddSingleton<EP_Kviz.Services.GameManager>();
 builder.Services.AddDbContext<AppDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-
-
 var app = builder.Build();
 
-
+// Apply pending migrations on startup (creates DB if missing)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -53,7 +53,7 @@ if (!app.Environment.IsDevelopment())
 }
 app.UseSession();
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
