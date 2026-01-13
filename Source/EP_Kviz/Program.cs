@@ -37,6 +37,13 @@ options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnectio
 
 var app = builder.Build();
 
+// Apply pending migrations on startup (creates DB if missing)
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    db.Database.Migrate();
+}
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
