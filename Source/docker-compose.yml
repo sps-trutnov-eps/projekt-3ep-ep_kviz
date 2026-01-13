@@ -1,0 +1,6 @@
+services:
+  ep_kviz:
+    image: ${DOCKER_REGISTRY-}epkviz
+    build:
+      context: .
+      dockerfile: EP_Kviz/Dockerfile
